@@ -19,7 +19,7 @@ const TaskTypesManager = () => {
 
   const loadTaskTypes = async () => {
     try {
-      const res = await api.get('/task-types');
+      const res = await api.get('/tasks');
       setTaskTypes(res.data || []);
     } catch (err) {
       setError('Failed to load task types');
@@ -34,11 +34,11 @@ const TaskTypesManager = () => {
 
     try {
       if (editingId) {
-        await api.put(`/task-types/${editingId}`, {}, {
+        await api.put(`/tasks${editingId}`, {}, {
           params: { name, description }
         });
       } else {
-        await api.post('/task-types', {}, {
+        await api.post('/tasks', {}, {
           params: { name, description }
         });
       }

@@ -1,6 +1,6 @@
 // src/components/TaskTypeSelector.jsx
 const TaskTypeSelector = ({ taskTypes, value, onChange }) => {
-  // ✅ Проверяем что taskTypes это массив
+  
   const taskList = Array.isArray(taskTypes) ? taskTypes : [];
 
   return (

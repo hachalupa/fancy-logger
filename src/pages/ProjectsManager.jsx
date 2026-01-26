@@ -11,12 +11,12 @@ const ProjectsManager = () => {
   const [formData, setFormData] = useState({
     name: '',
     description: '',
-    projectManager: '',
-    hoursAllocated: ''
+    hours: ''
   });
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(true);
-
+  const [success, setSuccess] = useState('');
+  
   useEffect(() => {
     loadProjects();
   }, []);
@@ -24,7 +24,7 @@ const ProjectsManager = () => {
   const loadProjects = async () => {
     try {
       const res = await api.get('/projects');
-      setProjects(res.data || []);
+      setProjects(res.data.data || []);
     } catch (err) {
       setError('Failed to load projects');
     } finally {
@@ -46,23 +46,29 @@ const ProjectsManager = () => {
 
     try {
       if (editingId) {
-        await api.put(`/projects/${editingId}`, {}, {
-          params: formData
+        await api.put(`/projects/${editingId.id}`, {
+          name: formData.name,
+          description: formData.description,
+          hours: formData.hours
         });
+        setSuccess('✅ Project updated successfully!');
       } else {
-        await api.post('/projects', {}, {
-          params: formData
+        await api.post('/projects', {
+          name: formData.name,
+          description: formData.description,
+          hours: formData.hours
         });
-      }
+        setSuccess('✅ Project created successfully!');
 
-      setFormData({ name: '', description: '', projectManager: '', hoursAllocated: '' });
+      setFormData({ name: '', description: '',  hours: '' });
       setEditingId(null);
       setShowForm(false);
       loadProjects();
+      }
     } catch (err) {
       setError(err.response?.data?.message || 'Failed to save project');
     }
-  };
+  
 
   const handleEdit = (project) => {
     setEditingId(project.id);
@@ -70,7 +76,7 @@ const ProjectsManager = () => {
       name: project.name,
       description: project.description || '',
       projectManager: project.projectManager,
-      hoursAllocated: project.hoursAllocated.toString()
+      hoursAllocated: project.hours
     });
     setShowForm(true);
   };
@@ -133,7 +139,7 @@ const ProjectsManager = () => {
             type="number"
             name="hoursAllocated"
             placeholder="Hours allocated"
-            value={formData.hoursAllocated}
+            value={formData.hours}
             onChange={handleChange}
             required
             min="1"
@@ -153,7 +159,8 @@ const ProjectsManager = () => {
         <p>Loading...</p>
       ) : (
         <div className="items-list">
-          {projects.map((project) => (
+          {projects .filter(project => project.projectManager = user.username)
+          .map((project) => (
             <div key={project.id} className="item-card">
               <div>
                 <h4>{project.name}</h4>
@@ -178,5 +185,6 @@ const ProjectsManager = () => {
     </div>
   );
 };
+}
 
 export default ProjectsManager;

@@ -19,14 +19,18 @@ const Dashboard = () => {
   const [projectForm, setProjectForm] = useState({ 
     name: '', 
     description: '', 
-    projectManager: '', 
-    hoursAllocated: '' 
+    hours: ''
   });
   const [editingProject, setEditingProject] = useState(null);
   
   // TASK TYPES
-  const [taskTypes, setTaskTypes] = useState([]);
-  const [taskForm, setTaskForm] = useState({ name: '', description: '' });
+  const [tasks, setTasks] = useState([]);
+  const [taskForm, setTaskForm] = useState({ 
+    name: '', 
+    description: '',
+    hours: '',
+    status: false
+  });
   const [editingTask, setEditingTask] = useState(null);
   
   // WORK ENTRIES
@@ -34,6 +38,12 @@ const Dashboard = () => {
   const [selectedProject, setSelectedProject] = useState('');
   const [selectedTask, setSelectedTask] = useState('');
   const [comment, setComment] = useState('');
+
+  // TYPES
+  const [types, setTypes] = useState([]);
+  const [selectedType, setSelectedType] = useState('');
+  const [typeForm, setTypeForm] = useState({ name: ''});
+  const [editingType, setEditingType] = useState(null);
   
   // UI STATE
   const [loading, setLoading] = useState(true);
@@ -41,6 +51,7 @@ const Dashboard = () => {
   const [success, setSuccess] = useState('');
   const [showProjectForm, setShowProjectForm] = useState(false);
   const [showTaskForm, setShowTaskForm] = useState(false);
+  const [showTypeForm, setShowTypeForm] = useState(false);
 
   useEffect(() => {
     loadAllData();
@@ -51,18 +62,22 @@ const Dashboard = () => {
     setError('');
     
     try {
-      const [projRes, tasksRes, entriesRes] = await Promise.all([
+      const [projRes, tasksRes, entriesRes, typesRes] = await Promise.all([
         api.get('/projects').catch(() => ({ data: [] })),
+        api.get('/tasks').catch(() => ({ data: [] })),
+        api.get('/work-entries').catch(() => ({ data: [] })),
         api.get('/types').catch(() => ({ data: [] })),
-        api.get('/work-entries').catch(() => ({ data: [] }))
       ]);
       
-      setProjects(Array.isArray(projRes.data) ? projRes.data : []);
-      setTaskTypes(Array.isArray(tasksRes.data) ? tasksRes.data : []);
-      setEntries(Array.isArray(entriesRes.data) ? entriesRes.data : []);
+      setProjects(Array.isArray(projRes.data.data) ? projRes.data.data : []);   
+      setTasks(Array.isArray(tasksRes.data.data) ? tasksRes.data.data : []);  
+      setEntries(Array.isArray(entriesRes.data.data) ? entriesRes.data.data : []);
+      setTypes(Array.isArray(typesRes.data.data) ? typesRes.data.data : []);
       
       console.log('✅ Projects loaded:', projRes.data);
-      console.log('✅ Task types loaded:', tasksRes.data);
+      console.log('✅ Tasks loaded:', tasksRes.data);
+      console.log('✅ Types loaded:', typesRes.data);
+
     } catch (err) {
       console.error('Error loading:', err);
       setError('Failed to load data');
@@ -77,21 +92,29 @@ const Dashboard = () => {
     setError('');
     setSuccess('');
 
-    if (!projectForm.name || !projectForm.projectManager || !projectForm.hoursAllocated) {
-      setError('❌ Fill in all required fields (Name, Manager, Hours)');
+    if (!projectForm.name || !projectForm.hours) {
+      setError('❌ Fill in all required fields (Name, Description, Hours)');
       return;
     }
 
     try {
       if (editingProject) {
-        await api.put(`/projects/${editingProject.id}`, {}, { params: projectForm });
+        await api.put(`/projects/${editingProject.id}`, {
+          name: projectForm.name,
+          description: projectForm.description,
+          hours: projectForm.hours
+        });
         setSuccess('✅ Project updated successfully!');
       } else {
-        await api.post('/projects', {}, { params: projectForm });
+        await api.post('/projects', {
+          name: projectForm.name,
+          description: projectForm.description,
+          hours: projectForm.hours
+        });
         setSuccess('✅ Project created successfully!');
       }
 
-      setProjectForm({ name: '', description: '', projectManager: '', hoursAllocated: '' });
+      setProjectForm({ name: '', description: '',  hours: '' });
       setEditingProject(null);
       setShowProjectForm(false);
       
@@ -111,7 +134,7 @@ const Dashboard = () => {
       name: project.name,
       description: project.description || '',
       projectManager: project.projectManager,
-      hoursAllocated: project.hoursAllocated.toString()
+      hours: project.hours
     });
     setShowProjectForm(true);
     setActiveTab('projects');
@@ -135,11 +158,11 @@ const Dashboard = () => {
   const handleCancelProjectForm = () => {
     setShowProjectForm(false);
     setEditingProject(null);
-    setProjectForm({ name: '', description: '', projectManager: '', hoursAllocated: '' });
+    setProjectForm({ name: '', description: '', hours: '' });
     setError('');
   };
 
-  // ===== TASK TYPES HANDLERS =====
+  // ===== TASKS HANDLERS =====
   const handleSaveTask = async (e) => {
     e.preventDefault();
     setError('');
@@ -152,14 +175,24 @@ const Dashboard = () => {
 
     try {
       if (editingTask) {
-        await api.put(`/types/${editingTask.id}`, {}, { params: taskForm });
+        await api.patch(`/tasks/${editingTask.id}`, {
+          name: taskForm.name,
+          description: taskForm.description,
+          hours: taskForm.hours,
+          status: taskForm.status
+        });
         setSuccess('✅ Task type updated successfully!');
       } else {
-        await api.post('/types', {}, { params: taskForm });
+        await api.post('/tasks', {
+          name: taskForm.name,
+          description: taskForm.description,
+          hours: taskForm.hours,
+          status: taskForm.status
+        });
         setSuccess('✅ Task type created successfully!');
       }
 
-      setTaskForm({ name: '', description: '' });
+      setTaskForm({ name: '', description: '', hours: '', status: false });
       setEditingTask(null);
       setShowTaskForm(false);
       
@@ -177,7 +210,9 @@ const Dashboard = () => {
     setEditingTask(task);
     setTaskForm({
       name: task.name,
-      description: task.description || ''
+      description: task.description || '',
+      hours: task.hours,
+      status: task.status
     });
     setShowTaskForm(true);
     setActiveTab('tasks');
@@ -187,7 +222,7 @@ const Dashboard = () => {
     if (!window.confirm('🗑️ Delete this task type? This cannot be undone.')) return;
 
     try {
-      await api.delete(`/types/${id}`);
+      await api.delete(`/tasks/${id}`);
       setSuccess('✅ Task type deleted!');
       setTimeout(() => {
         loadAllData();
@@ -201,9 +236,79 @@ const Dashboard = () => {
   const handleCancelTaskForm = () => {
     setShowTaskForm(false);
     setEditingTask(null);
-    setTaskForm({ name: '', description: '' });
+    setTaskForm({ name: '', description: '', hours: '', status: false });
     setError('');
   };
+
+  // ===== TYPES HANDLER =====
+  const handleSaveType = async (e) => {
+    e.preventDefault();
+    setError('');
+    setSuccess('');
+
+    if (!typeForm.name) {
+      setError('❌ Type name is required');
+      return;
+    }
+
+    try {
+      if (editingType) {
+        await api.put(`/types/${editingTask.id}`, {
+          name: typeForm.name
+        });
+        setSuccess('✅ Type updated successfully!');
+      } else {
+        await api.post('/types', {
+          name: typeForm.name,
+        });
+        setSuccess('✅ Type created successfully!');
+      }
+
+      setTypeForm({ name: ''});
+      setEditingType(null);
+      setShowTypeForm(false);
+      
+      setTimeout(() => {
+        loadAllData();
+        setSuccess('');
+      }, 1500);
+    } catch (err) {
+      console.error('Save type error:', err);
+      setError('❌ ' + (err.response?.data?.message || 'Failed to save type'));
+    }
+  };
+
+  const handleEditType = (type) => {
+    setEditingType(type);
+    setTypeForm({
+      name: type.name,
+    });
+    setShowTypeForm(true);
+    setActiveTab('types');
+  };
+
+  const handleDeleteType = async (id) => {
+    if (!window.confirm('🗑️ Delete this type? This cannot be undone.')) return;
+
+    try {
+      await api.delete(`/types/${id}`);
+      setSuccess('✅ Type deleted!');
+      setTimeout(() => {
+        loadAllData();
+        setSuccess('');
+      }, 1000);
+    } catch (err) {
+      setError('❌ Failed to delete type');
+    }
+  };
+
+  const handleCancelTypeForm = () => {
+    setShowTaskForm(false);
+    setEditingTask(null);
+    setTaskForm({ name: '', description: '', hours: '' });
+    setError('');
+  };
+
 
   // ===== WORK ENTRY HANDLER =====
   const handleSaveEntry = async () => {
@@ -289,7 +394,13 @@ const Dashboard = () => {
           className={`tab-btn ${activeTab === 'tasks' ? 'active' : ''}`}
           onClick={() => setActiveTab('tasks')}
         >
-          ✓ Task Types ({taskTypes.length})
+          ✓ Tasks ({tasks.length})
+        </button>
+        <button
+          className={`tab-btn ${activeTab === 'types' ? 'active' : ''}`}
+          onClick={() => setActiveTab('types')}
+        >
+          Types ({types.length})
         </button>
       </nav>
 
@@ -313,7 +424,8 @@ const Dashboard = () => {
                   >
                     <option value="">Select Project...</option>
                     {projects.length > 0 ? (
-                      projects.map(p => (
+                      projects .filter(p => p.projectManager === user.username)
+                      .map(p => (
                         <option key={p.id} value={p.id}>{p.name}</option>
                       ))
                     ) : (
@@ -323,19 +435,19 @@ const Dashboard = () => {
                 </div>
                 
                 <div className="form-col">
-                  <label>Task Type *</label>
+                  <label>Tasks *</label>
                   <select 
                     value={selectedTask}
                     onChange={(e) => setSelectedTask(e.target.value)}
                     className="form-select"
                   >
                     <option value="">Select Task...</option>
-                    {taskTypes.length > 0 ? (
-                      taskTypes.map(t => (
+                    {tasks.length > 0 ? (
+                      tasks.map(t => (
                         <option key={t.id} value={t.id}>{t.name}</option>
                       ))
                     ) : (
-                      <option disabled>No task types - create one first!</option>
+                      <option disabled>No tasks - create one first!</option>
                     )}
                   </select>
                 </div>
@@ -424,23 +536,12 @@ const Dashboard = () => {
                 </div>
 
                 <div>
-                  <label>Project Manager Name *</label>
-                  <input
-                    type="text"
-                    placeholder="e.g., John Smith"
-                    value={projectForm.projectManager}
-                    onChange={(e) => setProjectForm({...projectForm, projectManager: e.target.value})}
-                    required
-                  />
-                </div>
-
-                <div>
                   <label>Hours Allocated *</label>
                   <input
                     type="number"
                     placeholder="e.g., 40"
-                    value={projectForm.hoursAllocated}
-                    onChange={(e) => setProjectForm({...projectForm, hoursAllocated: e.target.value})}
+                    value={projectForm.hours}
+                    onChange={(e) => setProjectForm({...projectForm, hours: parseInt(e.target.value)})}
                     min="1"
                     required
                   />
@@ -465,11 +566,12 @@ const Dashboard = () => {
             )}
 
             <div className="items-grid">
-              {projects.map((project) => (
+              {projects .filter(project => project.projectManager === user.username)
+              .map((project) => (
                 <div key={project.id} className="project-card">
                   <div className="card-header">
                     <h3>{project.name}</h3>
-                    <span className="hours-badge">{project.hoursAllocated}h</span>
+                    <span className="hours-badge">{project.hours}h</span>
                   </div>
                   {project.description && <p className="card-description">{project.description}</p>}
                   <div className="card-meta">
@@ -495,24 +597,24 @@ const Dashboard = () => {
           </section>
         )}
 
-        {/* ===== TASK TYPES TAB ===== */}
+        {/* ===== TASKS TAB ===== */}
         {activeTab === 'tasks' && (
           <section className="manager-section">
             <div className="section-header">
-              <h2>✓ Task Types Management</h2>
+              <h2>✓ Task Management</h2>
               {!showTaskForm && (
                 <button 
                   onClick={() => setShowTaskForm(true)}
                   className="btn-primary"
                 >
-                  ➕ Create New Task Type
+                  ➕ Create New Task
                 </button>
               )}
             </div>
 
             {showTaskForm && (
               <form onSubmit={handleSaveTask} className="manager-form">
-                <h3>{editingTask ? '✏️ Edit Task Type' : '✨ Create New Task Type'}</h3>
+                <h3>{editingTask ? '✏️ Edit Task' : '✨ Create New Task'}</h3>
                 
                 <div>
                   <label>Task Name *</label>
@@ -528,16 +630,37 @@ const Dashboard = () => {
                 <div>
                   <label>Description</label>
                   <textarea
-                    placeholder="What does this task type involve?"
+                    placeholder="What does this task involve?"
                     value={taskForm.description}
                     onChange={(e) => setTaskForm({...taskForm, description: e.target.value})}
                     rows="3"
                   />
                 </div>
 
+                <div>
+                  <label>Hours Allocated *</label>
+                  <input
+                    type="number"
+                    placeholder="e.g., 40"
+                    value={taskForm.hours}
+                    onChange={(e) => setTaskForm({...taskForm, hours: parseInt(e.target.value)})}
+                    min="1"
+                    required
+                  />
+                </div>
+
+                <div>
+                  <label>Status</label>
+                  <input
+                    type='checkbox'
+                    checked={taskForm.status || false}
+                    onChange={(e) => setTaskForm({...taskForm, status: e.target.checked})}
+                  />
+                </div>
+
                 <div className="form-buttons">
                   <button type="submit" className="btn-primary">
-                    {editingTask ? '💾 Update Task Type' : '✅ Create Task Type'}
+                    {editingTask ? '💾 Update Task' : '✅ Create Task'}
                   </button>
                   <button type="button" onClick={handleCancelTaskForm} className="btn-secondary">
                     ✕ Cancel
@@ -546,15 +669,16 @@ const Dashboard = () => {
               </form>
             )}
 
-            {taskTypes.length === 0 && !showTaskForm && (
+            {tasks.length === 0 && !showTaskForm && (
               <div className="empty-state">
-                <p>📭 No task types yet</p>
-                <p>Click "Create New Task Type" button to get started!</p>
+                <p>📭 No tasks yet</p>
+                <p>Click "Create New Task" button to get started!</p>
               </div>
             )}
 
             <div className="items-list">
-              {taskTypes.map((task) => (
+              {tasks // filter maybe
+              .map((task) => (
                 <div key={task.id} className="task-item">
                   <div>
                     <h4>✓ {task.name}</h4>
@@ -579,12 +703,86 @@ const Dashboard = () => {
             </div>
           </section>
         )}
+        
+        {/* ===== TYPES TAB ===== */}
+        {activeTab === 'types' && (
+          <section className="manager-section">
+            <div className="section-header">
+              <h2>✓ Types Management</h2>
+              {!showTypeForm && (
+                <button 
+                  onClick={() => setShowTypeForm(true)}
+                  className="btn-primary"
+                >
+                  ➕ Create New Type
+                </button>
+              )}
+            </div>
+
+            {showTypeForm && (
+              <form onSubmit={handleSaveType} className="manager-form">
+                <h3>{editingType ? '✏️ Edit Type' : '✨ Create New Type'}</h3>
+                
+                <div>
+                  <label>Type Name *</label>
+                  <input
+                    type="text"
+                    placeholder="e.g., Design Creation, Programming, Testing"
+                    value={typeForm.name}
+                    onChange={(e) => setTypeForm({...typeForm, name: e.target.value})}
+                    required
+                  />
+                </div>
+
+                <div className="form-buttons">
+                  <button type="submit" className="btn-primary">
+                    {editingType ? '💾 Update Type' : '✅ Create Type'}
+                  </button>
+                  <button type="button" onClick={handleCancelTypeForm} className="btn-secondary">
+                    ✕ Cancel
+                  </button>
+                </div>
+              </form>
+            )}
+
+            {types.length === 0 && !showTypeForm && (
+              <div className="empty-state">
+                <p>📭 No types yet</p>
+                <p>Click "Create New Type" button to get started!</p>
+              </div>
+            )}
+
+            <div className="items-list">
+              {types.map((type) => (
+                <div key={type.id} className="type-item">
+                  <div>
+                    <h4>✓ {type.name}</h4>
+                  </div>
+                  <div className="item-actions">
+                    <button 
+                      onClick={() => handleEditType(type)}
+                      className="btn-edit"
+                    >
+                      ✏️ Edit
+                    </button>
+                    <button 
+                      onClick={() => handleDeleteType(type.id)}
+                      className="btn-delete"
+                    >
+                      🗑️ Delete
+                    </button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </section>
+        )}
       </main>
     </div>
   );
 };
 
-// Утилиты
+
 const formatDuration = (seconds) => {
   const hours = Math.floor(seconds / 3600);
   const minutes = Math.floor((seconds % 3600) / 60);

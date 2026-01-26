@@ -21,10 +21,10 @@ const Login = () => {
       const response = await api.post('/auth/signin', { username, password });
       console.log('LOGIN RESPONSE:', response.data);  // ← DEBUG
       
-      // ✅ Сохраняем данные
+      
       login(response.data);
       
-      // ✅ Проверяем что сохранилось
+     
       const savedToken = localStorage.getItem('authToken');
       console.log('SAVED TOKEN:', savedToken);  // ← DEBUG
       navigate('/dashboard', { replace: true });

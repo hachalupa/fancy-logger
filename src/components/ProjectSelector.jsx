@@ -1,6 +1,6 @@
 // src/components/ProjectSelector.jsx
 const ProjectSelector = ({ projects, value, onChange }) => {
-  // ✅ Проверяем что projects это массив
+  
   const projectList = Array.isArray(projects) ? projects : [];
 
   return (
