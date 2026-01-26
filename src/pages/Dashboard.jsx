@@ -151,6 +151,7 @@ const Dashboard = () => {
         setSuccess('');
       }, 1000);
     } catch (err) {
+      console.log(err)
       setError('❌ Failed to delete project');
     }
   };
@@ -181,7 +182,7 @@ const Dashboard = () => {
           hours: taskForm.hours,
           status: taskForm.status
         });
-        setSuccess('✅ Task type updated successfully!');
+        setSuccess('✅ Task updated successfully!');
       } else {
         await api.post('/tasks', {
           name: taskForm.name,
@@ -189,7 +190,7 @@ const Dashboard = () => {
           hours: taskForm.hours,
           status: taskForm.status
         });
-        setSuccess('✅ Task type created successfully!');
+        setSuccess('✅ Task created successfully!');
       }
 
       setTaskForm({ name: '', description: '', hours: '', status: false });
@@ -566,7 +567,7 @@ const Dashboard = () => {
             )}
 
             <div className="items-grid">
-              {projects .filter(project => project.projectManager === user.username)
+              {projects .filter(project => project.manager === user.id)
               .map((project) => (
                 <div key={project.id} className="project-card">
                   <div className="card-header">

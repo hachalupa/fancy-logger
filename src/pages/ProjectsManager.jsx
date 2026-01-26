@@ -15,17 +15,21 @@ const ProjectsManager = () => {
   });
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(true);
-  const [success, setSuccess] = useState('');
   
   useEffect(() => {
     loadProjects();
   }, []);
 
   const loadProjects = async () => {
+    setLoading(true);
+
     try {
-      const res = await api.get('/projects');
-      setProjects(res.data.data || []);
+      console.log('good')
+      const res = await api.get('/projects').catch(() => ({data: []}));
+      setProjects(Array.isArray(res.data.data) ? res.data.data : [] );
+      console.log(res.data)
     } catch (err) {
+      console.log("Error loading:", err)
       setError('Failed to load projects');
     } finally {
       setLoading(false);
@@ -43,6 +47,11 @@ const ProjectsManager = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
+    
+    if (!formData.name || !formData.hours) {
+      setError(setError('❌ Fill in all required fields (Name, Description, Hours)'));
+      return;
+    }
 
     try {
       if (editingId) {
@@ -51,24 +60,22 @@ const ProjectsManager = () => {
           description: formData.description,
           hours: formData.hours
         });
-        setSuccess('✅ Project updated successfully!');
       } else {
         await api.post('/projects', {
           name: formData.name,
           description: formData.description,
           hours: formData.hours
         });
-        setSuccess('✅ Project created successfully!');
+      }
 
       setFormData({ name: '', description: '',  hours: '' });
       setEditingId(null);
       setShowForm(false);
       loadProjects();
-      }
     } catch (err) {
       setError(err.response?.data?.message || 'Failed to save project');
     }
-  
+  };
 
   const handleEdit = (project) => {
     setEditingId(project.id);
@@ -76,7 +83,7 @@ const ProjectsManager = () => {
       name: project.name,
       description: project.description || '',
       projectManager: project.projectManager,
-      hoursAllocated: project.hours
+      hours: project.hours
     });
     setShowForm(true);
   };
@@ -88,6 +95,7 @@ const ProjectsManager = () => {
       await api.delete(`/projects/${id}`);
       loadProjects();
     } catch (err) {
+      console.log(err)
       setError('Failed to delete');
     }
   };
@@ -95,13 +103,12 @@ const ProjectsManager = () => {
   const handleCancel = () => {
     setShowForm(false);
     setEditingId(null);
-    setFormData({ name: '', description: '', projectManager: '', hoursAllocated: '' });
+    setFormData({ name: '', description: '', hours: '' });
   };
 
   return (
     <div className="manager-container">
       <h2>Projects Management</h2>
-
       {error && <div className="error-message">{error}</div>}
 
       {!showForm && (
@@ -128,16 +135,8 @@ const ProjectsManager = () => {
             rows="3"
           />
           <input
-            type="text"
-            name="projectManager"
-            placeholder="Project manager name"
-            value={formData.projectManager}
-            onChange={handleChange}
-            required
-          />
-          <input
             type="number"
-            name="hoursAllocated"
+            name="hours"
             placeholder="Hours allocated"
             value={formData.hours}
             onChange={handleChange}
@@ -159,7 +158,8 @@ const ProjectsManager = () => {
         <p>Loading...</p>
       ) : (
         <div className="items-list">
-          {projects .filter(project => project.projectManager = user.username)
+          
+          {projects .filter(project => project.manager === user.id)
           .map((project) => (
             <div key={project.id} className="item-card">
               <div>
@@ -167,7 +167,7 @@ const ProjectsManager = () => {
                 {project.description && <p>{project.description}</p>}
                 <p className="meta">
                   Manager: <strong>{project.projectManager}</strong> | 
-                  Hours: <strong>{project.hoursAllocated}h</strong>
+                  Hours: <strong>{project.hours}h</strong>
                 </p>
               </div>
               <div className="item-actions">
@@ -185,6 +185,5 @@ const ProjectsManager = () => {
     </div>
   );
 };
-}
 
 export default ProjectsManager;
