@@ -1,4 +1,3 @@
-// src/pages/Login.jsx
 import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
@@ -18,19 +17,25 @@ const Login = () => {
     setLoading(true);
 
     try {
+      console.log('🔐 Sending login request...');
       const response = await api.post('/auth/signin', { username, password });
-      console.log('LOGIN RESPONSE:', response.data);  // ← DEBUG
       
+      console.log('✅ Login response received:', response.data);
       
+      // ✅ Вызываем login из контекста (он сохранит токен + user)
       login(response.data);
       
-     
-      const savedToken = localStorage.getItem('authToken');
-      console.log('SAVED TOKEN:', savedToken);  // ← DEBUG
+      // ✅ Редирект на dashboard
+      console.log('➡️ Redirecting to /dashboard');
       navigate('/dashboard', { replace: true });
     } catch (err) {
-      console.error('LOGIN ERROR:', err);  // ← DEBUG
-      setError(err.response?.data?.message || 'Login failed');
+      console.error('❌ LOGIN ERROR:', err);
+      
+      const errorMessage = err.response?.data?.message 
+        || err.response?.data?.error 
+        || 'Login failed. Please try again.';
+      
+      setError(errorMessage);
     } finally {
       setLoading(false);
     }

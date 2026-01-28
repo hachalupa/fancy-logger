@@ -18,7 +18,7 @@ const ProjectsManager = () => {
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
   const [loading, setLoading] = useState(true);
-
+  
   useEffect(() => {
     loadProjects();
   }, []);
@@ -28,8 +28,9 @@ const ProjectsManager = () => {
     setLoading(true);
     try {
       console.log('📥 Loading projects...');
-      console.log('👤 Current user:', user);
-      console.log('📍 user?.id:', user?.id);
+
+      console.log('👤 Current user:', user);  // ← ДОБАВЬ
+    console.log('📍 user?.id:', user?.id); 
 
       const res = await api.get('/projects');
       const projectsList = Array.isArray(res.data.data) ? res.data.data : [];
@@ -40,8 +41,8 @@ const ProjectsManager = () => {
         console.log(`Project ${p.id}: manager=${p.manager}, user.id=${user?.id}, match=${p.manager === user?.id}`);
         return p.manager === user?.id;
       });
-      console.log('🎯 Filtered projects (yours):', filtered);
-
+      console.log('🎯 Filtered projects (yours):', filtered);  // ← ДОБАВЬ
+      
       setProjects(projectsList);
     } catch (err) {
       console.error('❌ Error loading projects:', err);
@@ -63,7 +64,7 @@ const ProjectsManager = () => {
     e.preventDefault();
     setError('');
     setSuccess('');
-
+    
     if (!formData.name || !formData.hours) {
       setError('❌ Fill in all required fields (Name, Hours)');
       return;
@@ -89,7 +90,7 @@ const ProjectsManager = () => {
       setFormData({ name: '', description: '', hours: '' });
       setEditingId(null);
       setShowForm(false);
-
+      
       setTimeout(() => {
         loadProjects();
         setSuccess('');
@@ -159,7 +160,7 @@ const ProjectsManager = () => {
       {showForm && (
         <form onSubmit={handleSubmit} className="manager-form">
           <h3>{editingId ? '✏️ Edit Project' : '✨ Create New Project'}</h3>
-
+          
           <div>
             <label>Project Name *</label>
             <input
@@ -200,9 +201,9 @@ const ProjectsManager = () => {
             <button type="submit" className="btn btn--primary">
               {editingId ? '💾 Update Project' : '✅ Create Project'}
             </button>
-            <button
-              type="button"
-              onClick={handleCancel}
+            <button 
+              type="button" 
+              onClick={handleCancel} 
               className="btn btn--secondary"
             >
               ✕ Cancel
@@ -238,7 +239,7 @@ const ProjectsManager = () => {
               </div>
 
               <div className="card-actions">
-                <button
+                <button 
                   onClick={() => handleViewTasks(project.id)}
                   className="btn btn--outline btn--sm"
                   title="View and manage tasks for this project"
@@ -246,17 +247,17 @@ const ProjectsManager = () => {
                   📋 Tasks
                 </button>
 
-                <button
+                <button 
                   onClick={() => handleEdit(project)}
                   className="btn btn--outline btn--sm"
                 >
                   ✏️ Edit
                 </button>
 
-                <button
+                <button 
                   onClick={() => handleDelete(project.id)}
                   className="btn btn--outline btn--sm"
-                  style={{
+                  style={{ 
                     background: 'var(--color-error)',
                     color: 'var(--color-white)',
                     border: 'none'

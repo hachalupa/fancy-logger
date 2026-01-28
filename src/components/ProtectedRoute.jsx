@@ -1,15 +1,25 @@
-// src/components/ProtectedRoute.jsx
 import { Navigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 
 const ProtectedRoute = ({ children }) => {
-  const { user, loading } = useAuth();
+  const { isAuthenticated, loading } = useAuth();  // ← Используем isAuthenticated
 
   if (loading) {
-    return <div style={{ padding: '20px' }}>Loading...</div>;
+    return (
+      <div style={{ 
+        padding: '40px', 
+        textAlign: 'center',
+        fontSize: '16px',
+        color: 'var(--color-text-secondary)'
+      }}>
+        ⏳ Verifying authentication...
+      </div>
+    );
   }
 
-  if (!user) {
+  // ✅ Если токен невалидный → редирект на логин
+  if (!isAuthenticated) {
+    console.log('🔒 ProtectedRoute: User not authenticated, redirecting to /login');
     return <Navigate to="/login" replace />;
   }
 

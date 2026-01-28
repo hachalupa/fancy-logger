@@ -9,6 +9,7 @@ import ForgotPassword from './pages/ForgotPassword';
 import ResetPassword from './pages/ResetPassword';
 import TaskTypesManager from './pages/TaskTypesManager';
 import ProjectsManager from './pages/ProjectsManager';
+import ProjectTasks from './pages/ProjectTasks';
 
 
 
@@ -44,6 +45,15 @@ function App() {
             element={
               <ProtectedRoute>
                 <ProjectsManager />
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
+            path="/projects/:projectId/tasks"
+            element={
+              <ProtectedRoute>
+                <ProjectTasks />
               </ProtectedRoute>
             }
           />

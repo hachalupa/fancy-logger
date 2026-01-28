@@ -1,6 +1,6 @@
 // src/pages/Dashboard.jsx
 import { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { useTimer } from '../hooks/useTimer';
 import Timer from '../components/Timer';
@@ -87,23 +87,37 @@ const Dashboard = () => {
   };
 
   // ===== PROJECTS HANDLERS =====
+
+   // ✅ НОВАЯ ФУНКЦИЯ: Открыть задачи проекта
+  const handleViewTasks = (projectId) => {
+    console.log('📋 Opening tasks for project:', projectId);
+    navigate(`/projects/${projectId}/tasks`);
+  };
+
+
+
+
   const handleSaveProject = async (e) => {
     e.preventDefault();
     setError('');
     setSuccess('');
 
     if (!projectForm.name || !projectForm.hours) {
-      setError('❌ Fill in all required fields (Name, Description, Hours)');
+      setError('❌ Fill in all required fields (Name, Hours)');
       return;
     }
 
     try {
+      const payload = {
+        name: projectForm.name,
+        description: projectForm.description,
+        hours: projectForm.hours
+      };
+
+      console.log('📤 Sending payload:', payload);  // ← СМОТРИ ЧТО ОТПРАВЛЯЕТСЯ
+
       if (editingProject) {
-        await api.put(`/projects/${editingProject.id}`, {
-          name: projectForm.name,
-          description: projectForm.description,
-          hours: projectForm.hours
-        });
+        await api.patch(`/projects/${editingProject.id}`, payload);
         setSuccess('✅ Project updated successfully!');
       } else {
         await api.post('/projects', {
@@ -114,7 +128,7 @@ const Dashboard = () => {
         setSuccess('✅ Project created successfully!');
       }
 
-      setProjectForm({ name: '', description: '',  hours: '' });
+      setProjectForm({ name: '', description: '', hours: '' });
       setEditingProject(null);
       setShowProjectForm(false);
       
@@ -123,17 +137,18 @@ const Dashboard = () => {
         setSuccess('');
       }, 1500);
     } catch (err) {
-      console.error('Save project error:', err);
+      console.error('❌ Save error:', err);
       setError('❌ ' + (err.response?.data?.message || 'Failed to save project'));
     }
   };
+
 
   const handleEditProject = (project) => {
     setEditingProject(project);
     setProjectForm({
       name: project.name,
       description: project.description || '',
-      projectManager: project.projectManager,
+      manager: project.manager,
       hours: project.hours
     });
     setShowProjectForm(true);
@@ -254,7 +269,7 @@ const Dashboard = () => {
 
     try {
       if (editingType) {
-        await api.put(`/types/${editingTask.id}`, {
+        await api.put(`/types/${editingType.id}`, {
           name: typeForm.name
         });
         setSuccess('✅ Type updated successfully!');
@@ -304,9 +319,9 @@ const Dashboard = () => {
   };
 
   const handleCancelTypeForm = () => {
-    setShowTaskForm(false);
-    setEditingTask(null);
-    setTaskForm({ name: '', description: '', hours: '' });
+    setShowTypeForm(false);
+    setEditingType(null);
+    setTypeForm({ name: '' });
     setError('');
   };
 
@@ -373,6 +388,13 @@ const Dashboard = () => {
       <header className="header">
         <h1>⏱️ Fancy Logger</h1>
         <div>
+          <button><Link to={'/projects'}>Projects</Link></button>
+          <button
+            className={`tab-btn ${activeTab === 'types' ? 'active' : ''}`}
+            onClick={() => setActiveTab('types')}
+          >
+            Types ({types.length})
+          </button>
           <span>{user?.username}</span>
           <button onClick={handleLogout} className="logout-btn">Logout</button>
         </div>
@@ -425,7 +447,7 @@ const Dashboard = () => {
                   >
                     <option value="">Select Project...</option>
                     {projects.length > 0 ? (
-                      projects .filter(p => p.projectManager === user.username)
+                      projects .filter(p => p.manager === user.id)
                       .map(p => (
                         <option key={p.id} value={p.id}>{p.name}</option>
                       ))
@@ -576,9 +598,16 @@ const Dashboard = () => {
                   </div>
                   {project.description && <p className="card-description">{project.description}</p>}
                   <div className="card-meta">
-                    <p><strong>👤 Manager:</strong> {project.projectManager}</p>
+                    <p><strong>👤 Manager:</strong> {project.manager === user.id ? 'You' : `User ${project.manager}`}</p>
                   </div>
                   <div className="card-actions">
+                    {/* ✅ НОВАЯ КНОПКА: Tasks */}
+                    <button 
+                      onClick={() => handleViewTasks(project.id)}
+                      className="btn btn--primary btn--sm"
+                    >
+                      📋 Tasks
+                    </button>
                     <button 
                       onClick={() => handleEditProject(project)}
                       className="btn-edit"
