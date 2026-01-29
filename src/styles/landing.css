@@ -1,0 +1,295 @@
+/* src/styles/landing.css */
+/* Специфичные стили для landing page, использующие переменные из theme.css */
+
+.landing-hero {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-8);
+  align-items: center;
+  padding: var(--space-16) var(--space-4);
+  margin-top: 60px;
+}
+
+.landing-hero-content {
+  animation: slideInLeft var(--duration-normal) var(--ease-in-out);
+}
+
+.landing-hero-content h1 {
+  margin-bottom: var(--space-4);
+}
+
+.landing-hero-content .highlight {
+  color: var(--color-primary);
+}
+
+.landing-hero-content p {
+  margin-bottom: var(--space-6);
+  font-size: var(--font-size-lg);
+}
+
+.landing-hero-image {
+  animation: slideInRight var(--duration-normal) var(--ease-in-out);
+}
+
+.landing-mockup {
+  background: var(--color-surface);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-lg);
+  padding: var(--space-6);
+  border: 1px solid var(--color-border);
+}
+
+.landing-mockup-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: var(--space-4);
+  padding-bottom: var(--space-4);
+  border-bottom: 1px solid var(--color-border);
+}
+
+.landing-stats {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: var(--space-4);
+  margin-bottom: var(--space-6);
+}
+
+.landing-stat-card {
+  background: var(--color-surface-alt);
+  padding: var(--space-4);
+  border-radius: var(--radius-base);
+  text-align: center;
+}
+
+.landing-stat-value {
+  font-size: var(--font-size-2xl);
+  font-weight: var(--font-weight-bold);
+  color: var(--color-primary);
+  margin-bottom: var(--space-2);
+}
+
+.landing-stat-label {
+  font-size: var(--font-size-sm);
+  color: var(--color-text-muted);
+}
+
+.landing-features-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: var(--space-6);
+  margin-bottom: var(--space-12);
+}
+
+.landing-feature-card {
+  animation: slideInUp var(--duration-normal) var(--ease-in-out);
+}
+
+.landing-feature-card .feature-icon {
+  font-size: var(--font-size-3xl);
+  margin-bottom: var(--space-4);
+  display: block;
+}
+
+.landing-pricing-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: var(--space-6);
+  margin-top: var(--space-8);
+}
+
+.landing-price-card {
+  position: relative;
+  animation: slideInUp var(--duration-normal) var(--ease-in-out);
+}
+
+.landing-price-card.featured {
+  border-color: var(--color-primary);
+  transform: scale(1.05);
+  box-shadow: var(--shadow-lg);
+}
+
+.landing-price-badge {
+  position: absolute;
+  top: -12px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: var(--color-primary);
+  color: var(--color-white);
+  padding: var(--space-2) var(--space-3);
+  border-radius: var(--radius-full);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-bold);
+}
+
+.landing-price-value {
+  font-size: var(--font-size-4xl);
+  font-weight: var(--font-weight-bold);
+  color: var(--color-primary);
+  margin: var(--space-4) 0 var(--space-2) 0;
+}
+
+.landing-navbar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  backdrop-filter: blur(10px);
+  z-index: var(--z-sticky);
+  border-bottom: 1px solid var(--color-border);
+  padding: var(--space-4) var(--space-6);
+}
+
+@media (max-width: 768px) {
+  .landing-hero {
+    grid-template-columns: 1fr;
+    padding: var(--space-8) var(--space-4);
+    margin-top: 80px;
+  }
+
+  .landing-hero-content h1 {
+    font-size: var(--font-size-2xl);
+  }
+
+  .landing-price-card.featured {
+    transform: scale(1);
+  }
+
+  .landing-features-grid,
+  .landing-pricing-cards {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* ===== MOBILE MENU ===== */
+
+.landing-navbar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  backdrop-filter: blur(10px);
+  z-index: var(--z-sticky);
+  border-bottom: 1px solid var(--color-border);
+  padding: var(--space-4) var(--space-4);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.landing-navbar-logo {
+  font-size: var(--font-size-xl);
+  font-weight: var(--font-weight-bold);
+  color: var(--color-primary);
+  text-decoration: none;
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.landing-navbar-desktop {
+  display: flex;
+  gap: var(--space-6);
+  align-items: center;
+}
+
+.landing-navbar-desktop a {
+  color: var(--color-text);
+  text-decoration: none;
+  font-size: var(--font-size-base);
+  transition: color var(--duration-fast);
+}
+
+.landing-navbar-desktop a:hover {
+  color: var(--color-primary);
+}
+
+.landing-navbar-toggle {
+  display: none;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: var(--space-2);
+  color: var(--color-text);
+}
+
+.landing-navbar-mobile {
+  display: none;
+  position: fixed;
+  top: 60px;
+  left: 0;
+  right: 0;
+  background: var(--color-surface);
+  border-bottom: 1px solid var(--color-border);
+  flex-direction: column;
+  gap: var(--space-4);
+  padding: var(--space-6) var(--space-4);
+  z-index: calc(var(--z-sticky) - 1);
+  animation: slideDown var(--duration-normal) var(--ease-in-out);
+}
+
+.landing-navbar-mobile.open {
+  display: flex;
+}
+
+.landing-navbar-mobile a {
+  color: var(--color-text);
+  text-decoration: none;
+  font-size: var(--font-size-lg);
+  font-weight: var(--font-weight-medium);
+  padding: var(--space-3) 0;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.landing-navbar-mobile a:last-child {
+  border-bottom: none;
+}
+
+.landing-navbar-mobile a:hover {
+  color: var(--color-primary);
+}
+
+.feature-icon {
+  font-size: 0;  /* Hide any text content */
+  height: 48px;
+  width: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: var(--space-4);
+  color: var(--color-primary);
+}
+
+.feature-icon .icon {
+  width: 100%;
+  height: 100%;
+}
+
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ===== RESPONSIVE ===== */
+@media (max-width: 768px) {
+  .landing-navbar-desktop {
+    display: none;
+  }
+
+  .landing-navbar-toggle {
+    display: block;
+  }
+}
+
+@media (min-width: 769px) {
+  .landing-navbar-mobile {
+    display: none !important;
+  }
+}

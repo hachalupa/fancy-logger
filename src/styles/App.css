@@ -17,11 +17,14 @@ body {
   justify-content: center;
   align-items: center;
   min-height: 100vh;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: url(../../public/background.png);
+  background-size: cover;
+  background-repeat: no-repeat
 }
 
 .auth-box {
-  background: white;
+  background: var(--color-background-auth);
+  backdrop-filter: blur(10px);
   padding: 40px;
   border-radius: 12px;
   box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
@@ -31,7 +34,7 @@ body {
 
 .auth-box h1 {
   margin-bottom: 10px;
-  color: #667eea;
+  color: var(--color-text);
   font-size: 28px;
   text-align: center;
 }
@@ -40,7 +43,7 @@ body {
   margin-bottom: 30px;
   font-size: 24px;
   text-align: center;
-  color: #2c3e50;
+  color: var(--color-text-secondary);
 }
 
 .auth-box form {
@@ -52,21 +55,23 @@ body {
 
 .auth-box input {
   padding: 12px 15px;
-  border: 1px solid #e0e6ed;
+  border: 1px solid var(--color-border);
+  background: none;
   border-radius: 8px;
   font-size: 16px;
+  color: var(--color-primary);
   transition: all 0.3s ease;
 }
 
 .auth-box input:focus {
   outline: none;
-  border-color: #667eea;
+  border-color: var(--color-border-strong);
   box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.1);
 }
 
 .auth-box button {
   padding: 12px;
-  background: #667eea;
+  background: var(--color-primary);
   color: white;
   border: none;
   border-radius: 8px;
@@ -77,9 +82,9 @@ body {
 }
 
 .auth-box button:hover {
-  background: #5568d3;
+  background: var(--color-primary-hover);
   transform: translateY(-2px);
-  box-shadow: 0 10px 20px rgba(102, 126, 234, 0.2);
+  box-shadow: 0 10px 20px rgba(98, 238, 128, 0.2);
 }
 
 .auth-box button:disabled {
@@ -100,18 +105,18 @@ body {
 .auth-box p {
   text-align: center;
   margin-top: 20px;
-  color: #7f8c8d;
+  color: var(--color-text-secondary);
 }
 
 .auth-box a {
-  color: #667eea;
+  color: var(--color-primary);
   text-decoration: none;
   font-weight: 600;
   transition: color 0.3s;
 }
 
 .auth-box a:hover {
-  color: #5568d3;
+  color: var(--color-primary-hover);
   text-decoration: underline;
 }
 

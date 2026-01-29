@@ -388,7 +388,19 @@ const Dashboard = () => {
       <header className="header">
         <h1>⏱️ Fancy Logger</h1>
         <div>
+          <button 
+            className={`tab-btn ${activeTab === 'log' ? 'active' : ''}`}
+            onClick={() => setActiveTab('log')}
+          >
+            ⏱️ Time Logger
+          </button>
           <button><Link to={'/projects'}>Projects</Link></button>
+          <button 
+            className={`tab-btn ${activeTab === 'tasks' ? 'active' : ''}`}
+            onClick={() => setActiveTab('tasks')}
+          >
+            ✓ Tasks ({tasks.length})
+          </button>
           <button
             className={`tab-btn ${activeTab === 'types' ? 'active' : ''}`}
             onClick={() => setActiveTab('types')}
@@ -399,33 +411,6 @@ const Dashboard = () => {
           <button onClick={handleLogout} className="logout-btn">Logout</button>
         </div>
       </header>
-
-      <nav className="tabs-nav">
-        <button 
-          className={`tab-btn ${activeTab === 'log' ? 'active' : ''}`}
-          onClick={() => setActiveTab('log')}
-        >
-          ⏱️ Time Logger
-        </button>
-        <button 
-          className={`tab-btn ${activeTab === 'projects' ? 'active' : ''}`}
-          onClick={() => setActiveTab('projects')}
-        >
-          📋 Projects ({projects.length})
-        </button>
-        <button 
-          className={`tab-btn ${activeTab === 'tasks' ? 'active' : ''}`}
-          onClick={() => setActiveTab('tasks')}
-        >
-          ✓ Tasks ({tasks.length})
-        </button>
-        <button
-          className={`tab-btn ${activeTab === 'types' ? 'active' : ''}`}
-          onClick={() => setActiveTab('types')}
-        >
-          Types ({types.length})
-        </button>
-      </nav>
 
       <main className="container">
         {error && <div className="error-message">{error}</div>}

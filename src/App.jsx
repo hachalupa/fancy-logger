@@ -10,8 +10,8 @@ import ResetPassword from './pages/ResetPassword';
 import TaskTypesManager from './pages/TaskTypesManager';
 import ProjectsManager from './pages/ProjectsManager';
 import ProjectTasks from './pages/ProjectTasks';
-
-
+import { LandingPage } from './pages/LandingPage';
+import { TestPage, TestIcons } from './pages/TestPage';
 
 function App() {
   return (
@@ -58,7 +58,7 @@ function App() {
             }
           />
 
-          <Route path="/" element={<Navigate to="/dashboard" replace />} />
+          <Route path="/" element={<LandingPage />} />
         </Routes>
       </BrowserRouter>
     </AuthProvider>
