@@ -9,12 +9,10 @@ export const AuthProvider = ({ children }) => {
   const [loading, setLoading] = useState(true);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
 
-  // ✅ НОВОЕ: Функция валидации токена
   const validateToken = async (savedToken) => {
     if (!savedToken) return false;
 
     try {
-      // Проверяем токен, запросив защищённый endpoint
       const response = await api.get('/auth/me', {
         headers: {
           'Authorization': `Bearer ${savedToken}`
@@ -22,14 +20,14 @@ export const AuthProvider = ({ children }) => {
       });
       
       console.log('✅ TOKEN VALID:', response.data);
-      return response.data; // Возвращаем данные пользователя
+      return response.data; 
     } catch (error) {
       console.error('❌ TOKEN INVALID:', error.response?.status);
       return false;
     }
   };
 
-  // ✅ НОВОЕ: Инициализация при старте
+
   useEffect(() => {
     const initAuth = async () => {
       const savedToken = localStorage.getItem('authToken');
@@ -38,17 +36,14 @@ export const AuthProvider = ({ children }) => {
       console.log('🔍 AUTH INIT - Checking token...');
 
       if (savedToken && savedUser) {
-        // Валидируем токен перед установкой
         const userData = await validateToken(savedToken);
         
         if (userData) {
-          // ✅ Токен валидный
           setToken(savedToken);
           setUser(JSON.parse(savedUser));
           setIsAuthenticated(true);
           console.log('✅ AUTH INITIALIZED - User logged in');
         } else {
-          // ❌ Токен истёк - очищаем localStorage
           console.log('❌ TOKEN EXPIRED - Clearing storage');
           localStorage.removeItem('authToken');
           localStorage.removeItem('authUser');
@@ -99,7 +94,7 @@ export const AuthProvider = ({ children }) => {
     <AuthContext.Provider value={{ 
       user, 
       token, 
-      isAuthenticated,  // ← НОВОЕ
+      isAuthenticated,
       login, 
       logout, 
       loading 

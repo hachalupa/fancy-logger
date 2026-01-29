@@ -212,7 +212,7 @@ export function LandingPage() {
       {/* ===== FOOTER ===== */}
       <footer className='footer' style={{ padding: 'var(--space-4) var(--space-0)', textAlign: 'center' }}>
         <div style={{ maxWidth: '1400px', margin: '0 auto' }}>
-          <p>&copy; 2026 Fancy Logger. Built with ❤️ for trackers like you.</p>
+          <p>&copy; 2026 Fancy Logger</p>
         </div>
       </footer>
     </>

@@ -79,9 +79,9 @@ const ProjectTasks = () => {
       return;
     }
 
-    // ✅ Валидация часов
+
     const projectTasksHours = tasks
-      .filter(t => t.projectId === parseInt(projectId) && t.id !== editingId)  // ✅ Только из текущего проекта!
+      .filter(t => t.projectId === parseInt(projectId) && t.id !== editingId) 
       .reduce((sum, t) => sum + (t.hours || 0), 0);
     const totalHours = projectTasksHours + parseInt(formData.hours);
     
@@ -199,7 +199,6 @@ const ProjectTasks = () => {
     );
   }
 
-  // Вычисления статистики
   const myTasks = tasks.filter(t => t.projectId === parseInt(projectId));
   const totalTasksHours = myTasks.reduce((sum, t) => sum + (t.hours || 0), 0);
   const completedTasks = myTasks.filter(t => t.status).length;

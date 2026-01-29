@@ -3,6 +3,7 @@ import { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import api from '../services/api';
+import { Section } from '../components/ui/Section';
 
 const ProjectsManager = () => {
   const { user } = useAuth();
@@ -23,7 +24,6 @@ const ProjectsManager = () => {
     loadProjects();
   }, []);
 
-  // ✅ ИСПРАВЛЕНИЕ: res.data.data вместо res.data
   const loadProjects = async () => {
     setLoading(true);
     try {
@@ -218,6 +218,7 @@ const ProjectsManager = () => {
           <p>📭 No projects yet. Create one to get started!</p>
         </div>
       ) : (
+        <Section>
         <div className="items-grid">
           {myProjects.map((project) => (
             <div key={project.id} className="project-card">
@@ -268,6 +269,7 @@ const ProjectsManager = () => {
             </div>
           ))}
         </div>
+        </Section>
       )}
     </div>
   );

@@ -87,8 +87,6 @@ const Dashboard = () => {
   };
 
   // ===== PROJECTS HANDLERS =====
-
-   // ✅ НОВАЯ ФУНКЦИЯ: Открыть задачи проекта
   const handleViewTasks = (projectId) => {
     console.log('📋 Opening tasks for project:', projectId);
     navigate(`/projects/${projectId}/tasks`);
@@ -114,7 +112,7 @@ const Dashboard = () => {
         hours: projectForm.hours
       };
 
-      console.log('📤 Sending payload:', payload);  // ← СМОТРИ ЧТО ОТПРАВЛЯЕТСЯ
+      console.log('📤 Sending payload:', payload); 
 
       if (editingProject) {
         await api.patch(`/projects/${editingProject.id}`, payload);
@@ -586,7 +584,6 @@ const Dashboard = () => {
                     <p><strong>👤 Manager:</strong> {project.manager === user.id ? 'You' : `User ${project.manager}`}</p>
                   </div>
                   <div className="card-actions">
-                    {/* ✅ НОВАЯ КНОПКА: Tasks */}
                     <button 
                       onClick={() => handleViewTasks(project.id)}
                       className="btn btn--primary btn--sm"

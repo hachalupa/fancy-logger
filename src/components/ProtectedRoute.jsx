@@ -2,7 +2,7 @@ import { Navigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 
 const ProtectedRoute = ({ children }) => {
-  const { isAuthenticated, loading } = useAuth();  // ← Используем isAuthenticated
+  const { isAuthenticated, loading } = useAuth(); 
 
   if (loading) {
     return (
@@ -17,7 +17,6 @@ const ProtectedRoute = ({ children }) => {
     );
   }
 
-  // ✅ Если токен невалидный → редирект на логин
   if (!isAuthenticated) {
     console.log('🔒 ProtectedRoute: User not authenticated, redirecting to /login');
     return <Navigate to="/login" replace />;

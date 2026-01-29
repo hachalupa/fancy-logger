@@ -22,10 +22,9 @@ const Login = () => {
       
       console.log('✅ Login response received:', response.data);
       
-      // ✅ Вызываем login из контекста (он сохранит токен + user)
+      
       login(response.data);
       
-      // ✅ Редирект на dashboard
       console.log('➡️ Redirecting to /dashboard');
       navigate('/dashboard', { replace: true });
     } catch (err) {
