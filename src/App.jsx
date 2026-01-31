@@ -11,6 +11,7 @@ import ProjectsManager from './pages/ProjectsManager';
 import ProjectTasks from './pages/ProjectTasks';
 import { LandingPage } from './pages/LandingPage';
 import { TestPage, TestIcons } from './pages/TestPage';
+import { Navbar } from './components/Navbar';
 
 function App() {
   return (
@@ -20,12 +21,13 @@ function App() {
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
           <Route path="/forgot-password" element={<ForgotPassword />} />
-          <Route path="/reset-password" element={<ResetPassword />} />
+          <Route path="/reset-password/*" element={<ResetPassword />} />
 
           <Route
             path="/dashboard"
             element={
               <ProtectedRoute>
+                
                 <Dashboard />
               </ProtectedRoute>
             }

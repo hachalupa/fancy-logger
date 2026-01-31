@@ -11,6 +11,7 @@ import { faBusinessTime, faBars, faXmark, faClock,
   faLock, 
   faMobileAlt  } from '@fortawesome/free-solid-svg-icons';
 import { Icon } from '../components/icons/Icon'
+import '../styles/navbar.css'
 
 export function LandingPage() {
   const navigate = useNavigate();
@@ -31,13 +32,13 @@ export function LandingPage() {
   return (
     <>
       {/* ===== NAVBAR ===== */}
-      <nav className="landing-navbar">
-        <a href="/" className="landing-navbar-logo">
+      <nav className="navbar">
+        <a href="/" className="navbar-logo">
         <FontAwesomeIcon icon={faBusinessTime} /> Fancy Logger
         </a>
 
         {/* Desktop Navigation */}
-        <div className="landing-navbar-desktop">
+        <div className="navbar-desktop">
           <a href="#features" onClick={(e) => { e.preventDefault(); handleNavClick('#features'); }}>
             Features
           </a>
@@ -51,7 +52,7 @@ export function LandingPage() {
 
         {/* Mobile Menu Toggle */}
         <button 
-          className="landing-navbar-toggle"
+          className="navbar-toggle"
           onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
           aria-label={mobileMenuOpen ? 'Close menu' : 'Open menu'}
         >
@@ -60,7 +61,7 @@ export function LandingPage() {
       </nav>
 
       {/* Mobile Navigation Menu */}
-      <div className={`landing-navbar-mobile ${mobileMenuOpen ? 'open' : ''}`}>
+      <div className={`navbar-mobile ${mobileMenuOpen ? 'open' : ''}`}>
         <a href="#features" onClick={(e) => { e.preventDefault(); handleNavClick('#features'); }}>
           Features
         </a>

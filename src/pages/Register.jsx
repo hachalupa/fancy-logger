@@ -5,6 +5,11 @@ import { useAuth } from '../context/AuthContext';
 import api from '../services/api';
 
 const Register = () => {
+
+  const USER_REGEX = /^[A-z][A-z0-9-_]{2,19}$/;
+  const PWD_REGEX = /^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#$%]).{6,40}$/;
+  const EMAIL_REGEX = /^((?!\.)[\w\-_.]*[^.])(@\w+)(\.\w+(\.\w+)?[^.\W])$/;
+
   const [username, setUsername] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -15,7 +20,16 @@ const Register = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
     setError('');
+    const v1 = USER_REGEX.test(username);
+    const v2 = PWD_REGEX.test(password);
+    const v3 = EMAIL_REGEX.test(email);
+
+    if (!v1 || !v2 || !v3) {
+        setError("Invalid Entry");
+        return;
+    }
     setLoading(true);
 
     try {
@@ -23,7 +37,13 @@ const Register = () => {
       login(response.data);
       navigate('/login', { replace: true });
     } catch (err) {
-      setError(err.response?.data?.message || 'Registration failed');
+      if (!err?.response) {
+                setError('No Server Response');
+            } else if (err.response?.status === 409) {
+                setError('Username Taken');
+            } else {
+                setError('Registration Failed')
+            }
     } finally {
       setLoading(false);
     }

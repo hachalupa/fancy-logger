@@ -777,9 +777,7 @@ css
 }
 
 .project-header-meta {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-  gap: var(--space-16);
+  display: flex;
   margin-top: var(--space-16);
 }
 
@@ -1004,19 +1002,24 @@ css
   gap: var(--space-8);
 }
 
-.form-group label {
+.form-group label,
+.manager-form label {
   font-weight: var(--font-weight-medium);
   font-size: var(--font-size-sm);
   color: var(--color-text);
 }
 
+
 .form-group input,
 .form-group textarea,
-.form-group select {
+.form-group select,
+.manager-form textarea,
+.manager-form input,
+.manager-form select {
   padding: var(--space-8) var(--space-12);
   border: 1px solid var(--color-border);
   border-radius: var(--radius-base);
-  background: var(--color-surface);
+  background: none;
   color: var(--color-text);
   font-family: var(--font-family-base);
   font-size: var(--font-size-md);
@@ -1027,13 +1030,17 @@ css
 
 .form-group input:focus,
 .form-group textarea:focus,
-.form-group select:focus {
+.form-group select:focus,
+.manager-form textarea:focus,
+.manager-form input:focus,
+.manager-form select:focus {
   outline: var(--focus-outline);
   border-color: var(--color-primary);
   box-shadow: var(--focus-ring);
 }
 
-.form-group textarea {
+.form-group textarea,
+.manager-form textarea {
   resize: vertical;
   min-height: 100px;
   font-family: var(--font-family-base);
@@ -1051,6 +1058,7 @@ css
   background-size: 16px;
   cursor: pointer;
 }
+
 
 @media (prefers-color-scheme: dark) {
   .form-group select {
@@ -1252,7 +1260,8 @@ css
   }
 
   .project-header-meta {
-    grid-template-columns: 1fr;
+    display: grid;
+    grid-template-rows: 1fr;
   }
 
   .progress-header {
@@ -1278,7 +1287,7 @@ css
   }
 
   .task-meta {
-    flex-direction: column;
+    flex-direction: row;
     gap: var(--space-8);
   }
 }

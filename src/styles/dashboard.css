@@ -890,7 +890,7 @@ p {
 }
 
 .error-message {
-  background: rgba(var(--color-error-rgb), var(--status-bg-opacity));
+  background: rgba(none, var(--status-bg-opacity));
   border: 1px solid rgba(var(--color-error-rgb), var(--status-border-opacity));
   color: var(--color-error);
 }
@@ -1054,7 +1054,7 @@ p {
   padding: var(--space-12);
   border: 1px solid var(--color-border);
   border-radius: var(--radius-base);
-  background: var(--color-surface);
+  background: none;
   color: var(--color-text);
   font-family: var(--font-family-base);
   font-size: var(--font-size-base);

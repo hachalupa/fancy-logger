@@ -30,11 +30,15 @@ const Login = () => {
     } catch (err) {
       console.error('❌ LOGIN ERROR:', err);
       
-      const errorMessage = err.response?.data?.message 
-        || err.response?.data?.error 
-        || 'Login failed. Please try again.';
-      
-      setError(errorMessage);
+      if (!err?.response) {
+                setError('No Server Response');
+            } else if (err.response?.status === 400) {
+                setError('Missing Username or Password');
+            } else if (err.response?.status === 401) {
+                setError('Unauthorized');
+            } else {
+                setError('Login Failed');
+            }
     } finally {
       setLoading(false);
     }

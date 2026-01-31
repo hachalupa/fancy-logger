@@ -7,11 +7,11 @@ const Timer = ({ timer }) => {
       </div>
       <div className="timer-buttons">
         {!timer.isRunning ? (
-          <button onClick={timer.start} className="btn-primary">▶️ Start</button>
+          <button onClick={timer.start} className="btn-primary">Start</button>
         ) : (
-          <button onClick={timer.stop} className="btn-danger">⏸️ Pause</button>
+          <button onClick={timer.stop} className="btn-danger">Pause</button>
         )}
-        <button onClick={timer.reset} className="btn-secondary">🔄 Reset</button>
+        <button onClick={timer.reset} className="btn-secondary">Reset</button>
       </div>
     </div>
   );

@@ -4,6 +4,8 @@ import { useAuth } from '../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import api from '../services/api';
 import { Section } from '../components/ui/Section';
+import '../styles/App.css'
+import { ButtonAdd, ButtonCancel, ButtonDelete, ButtonEdit, ButtonSave, ButtonBack, ButtonTask } from '../components/buttons/ActionButtons';
 
 const ProjectsManager = () => {
   const { user } = useAuth();
@@ -142,25 +144,29 @@ const ProjectsManager = () => {
   const myProjects = projects.filter(p => p.manager === user?.id);
 
   return (
-    <div className="manager-section">
+    <section className="manager-section">
       <div className="section-header">
-        <h2>📋 Projects Management ({myProjects.length})</h2>
+        <h2>Projects Management ({myProjects.length})</h2>
+        
+
+        {error && <div className="error-message">{error}</div>}
+        {success && <div className="success-message">{success}</div>}
+
+        {!showForm && (
+          <div style={{ marginRight: "10px",display:'flex', gap: "10px"}}>
+          <ButtonAdd onClick={() => setShowForm(true)} className="btn btn-primary">
+            Create New Project
+          </ButtonAdd>
+          <ButtonBack onClick={() => navigate('/dashboard')} className="btn btn-secondary">Go Back</ButtonBack>
+          </div>
+        )}
+        
       </div>
-
-      {error && <div className="error-message">{error}</div>}
-      {success && <div className="success-message">{success}</div>}
-
-      {!showForm && (
-        <button onClick={() => setShowForm(true)} className="btn btn--primary">
-          ➕ Create New Project
-        </button>
-      )}
-
       {showForm && (
         <form onSubmit={handleSubmit} className="manager-form">
-          <h3>{editingId ? '✏️ Edit Project' : '✨ Create New Project'}</h3>
+          <h3>{editingId ? 'Edit Project' : 'Create New Project'}</h3>
 
-          <div>
+          <div className='.description-form'>
             <label>Project Name *</label>
             <input
               type="text"
@@ -172,7 +178,7 @@ const ProjectsManager = () => {
             />
           </div>
 
-          <div>
+          <div className='.description-form'>
             <label>Description</label>
             <textarea
               name="description"
@@ -183,7 +189,7 @@ const ProjectsManager = () => {
             />
           </div>
 
-          <div>
+          <div className='.description-form'>
             <label>Hours Allocated *</label>
             <input
               type="number"
@@ -197,81 +203,74 @@ const ProjectsManager = () => {
           </div>
 
           <div className="form-buttons">
-            <button type="submit" className="btn btn--primary">
-              {editingId ? '💾 Update Project' : '✅ Create Project'}
-            </button>
-            <button
-              type="button"
+            <ButtonSave className="btn btn--primary">
+              {editingId ? 'Update Project' : 'Create Project'}
+            </ButtonSave>
+            <ButtonCancel
               onClick={handleCancel}
               className="btn btn--secondary"
             >
-              ✕ Cancel
-            </button>
+              Cancel
+            </ButtonCancel>
           </div>
         </form>
       )}
 
       {loading ? (
-        <p>⏳ Loading projects...</p>
+        <p>Loading projects...</p>
       ) : myProjects.length === 0 ? (
         <div className="empty-state">
-          <p>📭 No projects yet. Create one to get started!</p>
+          <p>No projects yet. Create one to get started!</p>
         </div>
       ) : (
         <Section>
-        <div className="items-grid">
+        <div className="items-list">
           {myProjects.map((project) => (
-            <div key={project.id} className="project-card">
-              <div className="card-header">
+            <div key={project.id} className="task-item">
+              <div>
                 <h3>{project.name}</h3>
+                
                 <span className="hours-badge">{project.hours}h</span>
+                
+                <div className="task-description">
+                {project.description && (
+                  <p>{project.description}</p>
+                )}
+
+                
+                  <p>
+                    <strong>Manager:</strong> {' '}
+                    {project.manager === user?.id ? 'You' : `User #${project.manager}`}
+                  </p>
+                </div>
               </div>
 
-              {project.description && (
-                <p className="card-description">{project.description}</p>
-              )}
-
-              <div className="card-meta">
-                <p>
-                  <strong>👤 Manager:</strong> {' '}
-                  {project.manager === user?.id ? '👉 You' : `User #${project.manager}`}
-                </p>
-              </div>
-
-              <div className="card-actions">
-                <button
+              <div className="item-actions">
+                <ButtonTask
                   onClick={() => handleViewTasks(project.id)}
-                  className="btn btn--outline btn--sm"
                   title="View and manage tasks for this project"
                 >
-                  📋 Tasks
-                </button>
+                  Tasks
+                </ButtonTask>
 
-                <button
+                <ButtonEdit
                   onClick={() => handleEdit(project)}
-                  className="btn btn--outline btn--sm"
                 >
-                  ✏️ Edit
-                </button>
+                  Edit
+                </ButtonEdit>
 
-                <button
+                <ButtonDelete
                   onClick={() => handleDelete(project.id)}
-                  className="btn btn--outline btn--sm"
-                  style={{
-                    background: 'var(--color-error)',
-                    color: 'var(--color-white)',
-                    border: 'none'
-                  }}
                 >
-                  🗑️ Delete
-                </button>
+                  Delete
+                </ButtonDelete>
               </div>
             </div>
           ))}
         </div>
         </Section>
       )}
-    </div>
+    </section>
   );
 };
 

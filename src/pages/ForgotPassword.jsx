@@ -17,7 +17,7 @@ const ForgotPassword = () => {
     setLoading(true);
 
     try {
-      await api.post('/auth/forgot-password', {}, { params: { email } });
+      await api.post('/auth/forgot-password', { email });
       setSuccess('Check your email for password reset link');
       setTimeout(() => navigate('/login'), 3000);
     } catch (err) {

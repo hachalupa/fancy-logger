@@ -13,6 +13,8 @@
   --color-slate-500: #626c70;
   --color-slate-700: #1f2121;
   --color-slate-900: #133436;
+  --color-white-opa: #dcfdd17e;
+  --color-slate-opa: #13343686;
   
   --color-teal-300: #1FB144;
   --color-teal-400: #1c973b;
@@ -20,6 +22,7 @@
   --color-teal-600: #106124;
   --color-teal-700: #0c451a;
   --color-green-opa: #0b2f1483;
+  --color-cream-opa: #fcfcf98d;
   
   --color-red-400: #ff5459;
   --color-red-500: #c0152f;
@@ -34,7 +37,8 @@
   --color-background: var(--color-cream-50);
   --color-surface: var(--color-white);
   --color-surface-alt: var(--color-gray-200);
-  --color-background-auth: var(--color-green-opa);
+  --color-background-auth: var(--color-white-opa);
+  --color-background-edit: var(--color-cream-opa);
   
   --color-text: var(--color-slate-900);
   --color-text-secondary: var(--color-slate-500);
@@ -45,6 +49,7 @@
   
   --color-success: var(--color-teal-500);
   --color-error: var(--color-red-500);
+  --color-error-hover: var(var(--color-red-400));
   --color-warning: var(--color-orange-500);
   
   /* ===== TYPOGRAPHY ===== */
@@ -128,6 +133,8 @@
     --color-primary: var(--color-teal-300);
     --color-primary-hover: var(--color-teal-400);
     --color-primary-active: var(--color-teal-500);
+    --color-background-auth: var(--color-green-opa);
+    --color-background-edit: var(--color-slate-opa);
   }
 }
 
@@ -185,6 +192,8 @@ a:hover {
   max-width: 1400px;
   margin: 0 auto;
   padding: 0 var(--space-4);
+  position: relative;
+  top: 80px;
 }
 
 .section {

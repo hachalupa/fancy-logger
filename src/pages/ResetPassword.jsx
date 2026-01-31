@@ -10,14 +10,17 @@ const ResetPassword = () => {
   const [loading, setLoading] = useState(false);
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
+  
   const token = searchParams.get('token');
 
+  // Если токена нет — показываем ошибку
   if (!token) {
     return (
       <div className="auth-page">
         <div className="auth-box">
-          <h2>Invalid Reset Link</h2>
+          <h2>❌ Invalid Reset Link</h2>
           <p>The password reset link is invalid or expired.</p>
+          <Button onClick={() => navigate('/login')}>Go to Login</Button>
         </div>
       </div>
     );
@@ -40,10 +43,8 @@ const ResetPassword = () => {
     setLoading(true);
 
     try {
-      await api.post('/auth/reset-password', {}, { 
-        params: { token, newPassword: password } 
-      });
-      setSuccess('Password reset successfully! Redirecting to login...');
+      await api.post('/auth/reset-password', { token, newPassword: password });
+      setSuccess('✅ Password reset successfully! Redirecting to login...');
       setTimeout(() => navigate('/login'), 2000);
     } catch (err) {
       setError(err.response?.data?.message || 'Failed to reset password');

@@ -3,6 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import api from '../services/api';
 import '../styles/project-tasks.css';
+import { ButtonAdd, ButtonBack, ButtonCancel, ButtonDelete, ButtonEdit, ButtonSave } from '../components/buttons/ActionButtons';
 
 const ProjectTasks = () => {
   const { projectId } = useParams();
@@ -213,23 +214,23 @@ const ProjectTasks = () => {
       {/* ===== HEADER ===== */}
       <div className="project-header">
         <div className="project-header-content">
-          <h1>📋 {project.name}</h1>
+          <h1>{project.name}</h1>
           <p className="project-header-subtitle">{project.description || 'No description'}</p>
           
           {/* Meta Information */}
           <div className="project-header-meta">
             <div className="meta-item">
-              <div className="meta-item-label">📅 Status</div>
+              <div className="meta-item-label">Status</div>
               <div className="meta-item-value" style={{ color: isProjectCompleted ? 'var(--color-success)' : 'var(--color-warning)' }}>
-                {isProjectCompleted ? '✅ Completed' : '🔄 In Progress'}
+                {isProjectCompleted ? 'Completed' : 'In Progress'}
               </div>
             </div>
             <div className="meta-item">
-              <div className="meta-item-label">📝 Tasks</div>
+              <div className="meta-item-label">Tasks</div>
               <div className="meta-item-value">{completedTasks}/{myTasks.length}</div>
             </div>
             <div className="meta-item">
-              <div className="meta-item-label">⏱️ Hours Used</div>
+              <div className="meta-item-label">Hours Used</div>
               <div className="meta-item-value" style={{ color: isOverBudget ? 'var(--color-error)' : 'var(--color-success)' }}>
                 {totalTasksHours}/{project.hours}h
               </div>
@@ -238,12 +239,12 @@ const ProjectTasks = () => {
         </div>
 
         <div className="project-header-actions">
-          <button 
+          <ButtonBack
             onClick={() => navigate('/projects')}
-            className="btn btn--outline btn--sm"
+            className="btn btn-secondary"
           >
-            ← Back to Projects
-          </button>
+            Back to Projects
+          </ButtonBack>
         </div>
       </div>
 
@@ -268,14 +269,14 @@ const ProjectTasks = () => {
         <div className="progress-header">
           <h3>📊 Project Progress</h3>
           <div className={`progress-status ${isProjectCompleted ? 'completed' : 'pending'}`}>
-            {isProjectCompleted ? '✅ Project Completed!' : '🔄 In Progress'}
+            {isProjectCompleted ? 'Project Completed!' : 'In Progress'}
           </div>
         </div>
 
         {/* Hours Progress */}
         <div className="progress-item">
           <div className="progress-label">
-            <span className="progress-label-title">⏱️ Hours Allocated</span>
+            <span className="progress-label-title">Hours Allocated</span>
             <span className="progress-label-value">{totalTasksHours}h / {project.hours}h</span>
           </div>
           <div className="progress-bar">
@@ -307,14 +308,14 @@ const ProjectTasks = () => {
       {/* ===== FORM SECTION ===== */}
       <div className="task-form-section">
         <div className="form-section-header">
-          <h3>{editingId ? '✏️ Edit Task' : '✨ Create New Task'}</h3>
+          <h3>{editingId ? 'Edit Task' : 'Create New Task'}</h3>
           {!showForm && (
-            <button 
+            <ButtonAdd 
               onClick={() => setShowForm(true)}
               className="btn btn--primary btn--sm"
             >
-              ➕ Add New Task
-            </button>
+              Add New Task
+            </ButtonAdd>
           )}
         </div>
 
@@ -388,16 +389,16 @@ const ProjectTasks = () => {
             </div>
 
             <div className="form-buttons">
-              <button type="submit" className="btn btn--primary">
-                {editingId ? '💾 Update Task' : '✅ Create Task'}
-              </button>
-              <button 
+              <ButtonSave type="submit" className="btn btn--primary">
+                {editingId ? 'Update Task' : 'Create Task'}
+              </ButtonSave>
+              <ButtonCancel 
                 type="button" 
                 onClick={handleCancel} 
                 className="btn btn--secondary"
               >
-                ✕ Cancel
-              </button>
+                Cancel
+              </ButtonCancel>
             </div>
           </form>
         )}
@@ -440,36 +441,29 @@ const ProjectTasks = () => {
 
                   <div className="task-meta">
                     <div className="meta-badge type">
-                      🏷️ {getTypeName(task.type || task.typeId)}
+                      {getTypeName(task.type || task.typeId)}
                     </div>
                     <div className="meta-badge hours">
-                      ⏱️ {task.hours}h ({hoursPercentage.toFixed(1)}%)
+                      {task.hours}h ({hoursPercentage.toFixed(1)}%)
                     </div>
                     <div className={`meta-badge status`}>
-                      {task.status ? '✅ Completed' : '⏳ Pending'}
+                      {task.status ? 'Completed' : 'Pending'}
                     </div>
                   </div>
                 </div>
               </div>
 
               <div className="task-actions">
-                <button 
+                <ButtonEdit
                   onClick={() => handleEdit(task)}
-                  className="btn btn--outline btn--sm"
                 >
-                  ✏️ Edit
-                </button>
-                <button 
+                  Edit
+                </ButtonEdit>
+                <ButtonDelete
                   onClick={() => handleDelete(task.id)}
-                  className="btn btn--outline btn--sm"
-                  style={{ 
-                    background: 'var(--color-error)',
-                    color: 'var(--color-white)',
-                    border: 'none'
-                  }}
                 >
-                  🗑️ Delete
-                </button>
+                  Delete
+                </ButtonDelete>
               </div>
             </div>
           );

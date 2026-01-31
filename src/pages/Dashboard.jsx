@@ -5,6 +5,11 @@ import { useAuth } from '../context/AuthContext';
 import { useTimer } from '../hooks/useTimer';
 import Timer from '../components/Timer';
 import api from '../services/api';
+import { Navbar } from '../components/Navbar'
+import { Section } from '../components/ui/Section'
+import { Card } from '../components/ui/Card'
+import { Button } from '../components/ui/Button'
+import { ButtonEdit, ButtonDelete, ButtonAdd, ButtonCancel, ButtonSave } from '../components/buttons/ActionButtons';
 
 const Dashboard = () => {
   const { user, logout } = useAuth();
@@ -383,32 +388,15 @@ const Dashboard = () => {
 
   return (
     <div className="dashboard">
-      <header className="header">
-        <h1>⏱️ Fancy Logger</h1>
-        <div>
-          <button 
-            className={`tab-btn ${activeTab === 'log' ? 'active' : ''}`}
-            onClick={() => setActiveTab('log')}
-          >
-            ⏱️ Time Logger
-          </button>
-          <button><Link to={'/projects'}>Projects</Link></button>
-          <button 
-            className={`tab-btn ${activeTab === 'tasks' ? 'active' : ''}`}
-            onClick={() => setActiveTab('tasks')}
-          >
-            ✓ Tasks ({tasks.length})
-          </button>
-          <button
-            className={`tab-btn ${activeTab === 'types' ? 'active' : ''}`}
-            onClick={() => setActiveTab('types')}
-          >
-            Types ({types.length})
-          </button>
-          <span>{user?.username}</span>
-          <button onClick={handleLogout} className="logout-btn">Logout</button>
-        </div>
-      </header>
+      <Navbar
+        variant="dashboard"
+        user={user}
+        activeTab={activeTab}
+        onTabChange={setActiveTab}
+        onLogout={handleLogout}
+        tasks={tasks}
+        types={types}
+      />
 
       <main className="container">
         {error && <div className="error-message">{error}</div>}
@@ -416,7 +404,7 @@ const Dashboard = () => {
 
         {/* ===== TIME LOGGER TAB ===== */}
         {activeTab === 'log' && (
-          <section className="timer-section">
+          <Section className="timer-section">
             <Timer timer={timer} />
             
             <div className="form-group">
@@ -467,17 +455,16 @@ const Dashboard = () => {
                 className="form-input"
               />
               
-              <button 
+              <ButtonSave 
                 onClick={handleSaveEntry} 
-                className="save-btn"
                 disabled={timer.seconds === 0 || !selectedProject || !selectedTask}
               >
-                💾 Save Entry ({formatDuration(timer.seconds)})
-              </button>
+                Save Entry ({formatDuration(timer.seconds)})
+              </ButtonSave>
             </div>
 
-            <section className="entries-section">
-              <h3>📊 Recent Work Entries ({entries.length})</h3>
+            <Section className="entries-section">
+              <h3>Recent Work Entries ({entries.length})</h3>
               {entries.length === 0 ? (
                 <p className="no-entries">No entries yet. Start tracking your work!</p>
               ) : (
@@ -497,8 +484,8 @@ const Dashboard = () => {
                   ))}
                 </div>
               )}
-            </section>
-          </section>
+            </Section>
+          </Section>
         )}
 
         {/* ===== PROJECTS TAB ===== */}
@@ -518,7 +505,7 @@ const Dashboard = () => {
 
             {showProjectForm && (
               <form onSubmit={handleSaveProject} className="manager-form">
-                <h3>{editingProject ? '✏️ Edit Project' : '✨ Create New Project'}</h3>
+                <h3>{editingProject ? '✏️ Edit Project' : 'Create New Project'}</h3>
                 
                 <div>
                   <label>Project Name *</label>
@@ -613,22 +600,15 @@ const Dashboard = () => {
         {activeTab === 'tasks' && (
           <section className="manager-section">
             <div className="section-header">
-              <h2>✓ Task Management</h2>
-              {!showTaskForm && (
-                <button 
-                  onClick={() => setShowTaskForm(true)}
-                  className="btn-primary"
-                >
-                  ➕ Create New Task
-                </button>
-              )}
+              <h2>Task Management</h2>
             </div>
 
             {showTaskForm && (
-              <form onSubmit={handleSaveTask} className="manager-form">
-                <h3>{editingTask ? '✏️ Edit Task' : '✨ Create New Task'}</h3>
+              <div className='modal'>
+                <form onSubmit={handleSaveTask} className="manager-form">
+                <h3>{editingTask ? 'Edit Task' : 'Create New Task'}</h3>
                 
-                <div>
+                <div className='description-form'>
                   <label>Task Name *</label>
                   <input
                     type="text"
@@ -639,7 +619,7 @@ const Dashboard = () => {
                   />
                 </div>
 
-                <div>
+                <div className='description-form'>
                   <label>Description</label>
                   <textarea
                     placeholder="What does this task involve?"
@@ -649,7 +629,7 @@ const Dashboard = () => {
                   />
                 </div>
 
-                <div>
+                <div className='description-form'>
                   <label>Hours Allocated *</label>
                   <input
                     type="number"
@@ -661,7 +641,7 @@ const Dashboard = () => {
                   />
                 </div>
 
-                <div>
+                <div className='description-form'>
                   <label>Status</label>
                   <input
                     type='checkbox'
@@ -671,44 +651,40 @@ const Dashboard = () => {
                 </div>
 
                 <div className="form-buttons">
-                  <button type="submit" className="btn-primary">
-                    {editingTask ? '💾 Update Task' : '✅ Create Task'}
-                  </button>
-                  <button type="button" onClick={handleCancelTaskForm} className="btn-secondary">
-                    ✕ Cancel
-                  </button>
+                  <ButtonSave type="submit" className="btn-primary">
+                    {editingTask ? 'Update Task' : 'Create Task'}
+                  </ButtonSave>
+                  <ButtonCancel onClick={handleCancelTaskForm} className="btn-secondary">
+                    Cancel
+                  </ButtonCancel>
                 </div>
               </form>
+              </div>
             )}
 
             {tasks.length === 0 && !showTaskForm && (
               <div className="empty-state">
-                <p>📭 No tasks yet</p>
+                <p>No tasks yet</p>
                 <p>Click "Create New Task" button to get started!</p>
               </div>
             )}
 
             <div className="items-list">
-              {tasks // filter maybe
+              {tasks
               .map((task) => (
                 <div key={task.id} className="task-item">
                   <div>
-                    <h4>✓ {task.name}</h4>
+                    <h4>{task.name}</h4>
                     {task.description && <p className="task-description">{task.description}</p>}
+                    {projects.filter(project => project.id === task.projectId) .map((project) => (<p>Project: {project.name}</p>))}
                   </div>
                   <div className="item-actions">
-                    <button 
-                      onClick={() => handleEditTask(task)}
-                      className="btn-edit"
-                    >
-                      ✏️ Edit
-                    </button>
-                    <button 
-                      onClick={() => handleDeleteTask(task.id)}
-                      className="btn-delete"
-                    >
-                      🗑️ Delete
-                    </button>
+                    <ButtonEdit onClick={() => handleEditTask(task)}>
+                    Edit
+                    </ButtonEdit>
+                    <ButtonDelete onClick={() => handleDeleteTask(task.id)}>
+                    Delete
+                    </ButtonDelete>
                   </div>
                 </div>
               ))}
@@ -720,20 +696,20 @@ const Dashboard = () => {
         {activeTab === 'types' && (
           <section className="manager-section">
             <div className="section-header">
-              <h2>✓ Types Management</h2>
+              <h2>Types Management</h2>
               {!showTypeForm && (
                 <button 
                   onClick={() => setShowTypeForm(true)}
                   className="btn-primary"
                 >
-                  ➕ Create New Type
+                  Create New Type
                 </button>
               )}
             </div>
 
             {showTypeForm && (
               <form onSubmit={handleSaveType} className="manager-form">
-                <h3>{editingType ? '✏️ Edit Type' : '✨ Create New Type'}</h3>
+                <h3>{editingType ? 'Edit Type' : 'Create New Type'}</h3>
                 
                 <div>
                   <label>Type Name *</label>
@@ -747,42 +723,36 @@ const Dashboard = () => {
                 </div>
 
                 <div className="form-buttons">
-                  <button type="submit" className="btn-primary">
-                    {editingType ? '💾 Update Type' : '✅ Create Type'}
-                  </button>
-                  <button type="button" onClick={handleCancelTypeForm} className="btn-secondary">
-                    ✕ Cancel
-                  </button>
+                  <ButtonSave type="submit" className="btn-primary">
+                    {editingType ? 'Update Type' : 'Create Type'}
+                  </ButtonSave>
+                  <ButtonCancel type="button" onClick={handleCancelTypeForm} className="btn-secondary">
+                    Cancel
+                  </ButtonCancel>
                 </div>
               </form>
             )}
 
             {types.length === 0 && !showTypeForm && (
               <div className="empty-state">
-                <p>📭 No types yet</p>
+                <p>No types yet</p>
                 <p>Click "Create New Type" button to get started!</p>
               </div>
             )}
 
             <div className="items-list">
               {types.map((type) => (
-                <div key={type.id} className="type-item">
+                <div key={type.id} className="task-item">
                   <div>
-                    <h4>✓ {type.name}</h4>
+                    <h4>{type.name}</h4>
                   </div>
                   <div className="item-actions">
-                    <button 
-                      onClick={() => handleEditType(type)}
-                      className="btn-edit"
-                    >
-                      ✏️ Edit
-                    </button>
-                    <button 
-                      onClick={() => handleDeleteType(type.id)}
-                      className="btn-delete"
-                    >
-                      🗑️ Delete
-                    </button>
+                    <ButtonEdit onClick={() => handleEditType(type)}>
+                      Edit
+                    </ButtonEdit>
+                    <ButtonDelete onClick={() => handleDeleteType(type.id)}>
+                      Delete
+                    </ButtonDelete>
                   </div>
                 </div>
               ))}
