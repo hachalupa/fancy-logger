@@ -6,9 +6,10 @@ import api from '../services/api';
 import { Section } from '../components/ui/Section';
 import '../styles/App.css'
 import { ButtonAdd, ButtonCancel, ButtonDelete, ButtonEdit, ButtonSave, ButtonBack, ButtonTask } from '../components/buttons/ActionButtons';
+import { Navbar } from '../components/Navbar';
 
 const ProjectsManager = () => {
-  const { user } = useAuth();
+  const { user, logout } = useAuth();
   const navigate = useNavigate();
   const [projects, setProjects] = useState([]);
   const [showForm, setShowForm] = useState(false);
@@ -21,6 +22,11 @@ const ProjectsManager = () => {
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
   const [loading, setLoading] = useState(true);
+
+  const handleLogout = () => {
+    logout();
+    navigate('/login', { replace: true });
+  };
 
   useEffect(() => {
     loadProjects();
@@ -144,133 +150,145 @@ const ProjectsManager = () => {
   const myProjects = projects.filter(p => p.manager === user?.id);
 
   return (
-    <section className="manager-section">
-      <div className="section-header">
-        <h2>Projects Management ({myProjects.length})</h2>
-        
+    <>
+    <Navbar
+        variant="projects"
+        user={user}
+        onLogout={handleLogout}
+      />
+    <main className='container'>
+      <section className="manager-section">
+        <div className="section-header">
+          <h2>Projects Management ({myProjects.length})</h2>
+          
 
-        {error && <div className="error-message">{error}</div>}
-        {success && <div className="success-message">{success}</div>}
+          {error && <div className="error-message">{error}</div>}
+          {success && <div className="success-message">{success}</div>}
 
-        {!showForm && (
-          <div style={{ marginRight: "10px",display:'flex', gap: "10px"}}>
-          <ButtonAdd onClick={() => setShowForm(true)} className="btn btn-primary">
-            Create New Project
-          </ButtonAdd>
-          <ButtonBack onClick={() => navigate('/dashboard')} className="btn btn-secondary">Go Back</ButtonBack>
+          {!showForm && (
+            <div style={{ marginRight: "10px",display:'flex', gap: "10px"}}>
+            <ButtonAdd onClick={() => setShowForm(true)} className="btn btn-primary">
+              Create New Project
+            </ButtonAdd>
+            </div>
+          )}
+          
+        </div>
+        {showForm && (
+          <div className='modal-backdrop' onClick={handleCancel}>
+            <div className='modal' onClick={(e) => e.stopPropagation()}>
+              <form onSubmit={handleSubmit} className="manager-form">
+                <h3>{editingId ? 'Edit Project' : 'Create New Project'}</h3>
+
+                <div className='description-form'>
+                  <label>Project Name *</label>
+                  <input
+                    type="text"
+                    name="name"
+                    placeholder="e.g., Mobile App Redesign"
+                    value={formData.name}
+                    onChange={handleChange}
+                    required
+                  />
+                </div>
+
+                <div className='description-form'>
+                  <label>Description</label>
+                  <textarea
+                    name="description"
+                    placeholder="What is this project about?"
+                    value={formData.description}
+                    onChange={handleChange}
+                    rows="3"
+                  />
+                </div>
+
+                <div className='description-form'>
+                  <label>Hours Allocated *</label>
+                  <input
+                    type="number"
+                    name="hours"
+                    placeholder="e.g., 40"
+                    value={formData.hours}
+                    onChange={handleChange}
+                    required
+                    min="1"
+                  />
+                </div>
+
+                <div className="form-buttons">
+                  <ButtonSave className="btn btn-primary">
+                    {editingId ? 'Update Project' : 'Create Project'}
+                  </ButtonSave>
+                  <ButtonCancel
+                    onClick={handleCancel}
+                    className="btn btn-secondary"
+                  >
+                    Cancel
+                  </ButtonCancel>
+                </div>
+              </form>
+            </div>
           </div>
         )}
-        
-      </div>
-      {showForm && (
-        <form onSubmit={handleSubmit} className="manager-form">
-          <h3>{editingId ? 'Edit Project' : 'Create New Project'}</h3>
 
-          <div className='.description-form'>
-            <label>Project Name *</label>
-            <input
-              type="text"
-              name="name"
-              placeholder="e.g., Mobile App Redesign"
-              value={formData.name}
-              onChange={handleChange}
-              required
-            />
+        {loading ? (
+          <p>Loading projects...</p>
+        ) : myProjects.length === 0 ? (
+          <div className="empty-state">
+            <p>No projects yet. Create one to get started!</p>
           </div>
+        ) : (
+          <Section>
+          <div className="items-list">
+            {myProjects.map((project) => (
+              <div key={project.id} className="task-item">
+                <div>
+                  <h3>{project.name}</h3>
+                  
+                  <span className="hours-badge">{project.hours}h</span>
+                  
+                  <div className="task-description">
+                  {project.description && (
+                    <p>{project.description}</p>
+                  )}
 
-          <div className='.description-form'>
-            <label>Description</label>
-            <textarea
-              name="description"
-              placeholder="What is this project about?"
-              value={formData.description}
-              onChange={handleChange}
-              rows="3"
-            />
-          </div>
+                  
+                    <p>
+                      <strong>Manager:</strong> {' '}
+                      {project.manager === user?.id ? 'You' : `User #${project.manager}`}
+                    </p>
+                  </div>
+                </div>
 
-          <div className='.description-form'>
-            <label>Hours Allocated *</label>
-            <input
-              type="number"
-              name="hours"
-              placeholder="e.g., 40"
-              value={formData.hours}
-              onChange={handleChange}
-              required
-              min="1"
-            />
-          </div>
+                <div className="item-actions">
+                  <ButtonTask
+                    onClick={() => handleViewTasks(project.id)}
+                    title="View and manage tasks for this project"
+                  >
+                    Tasks
+                  </ButtonTask>
 
-          <div className="form-buttons">
-            <ButtonSave className="btn btn--primary">
-              {editingId ? 'Update Project' : 'Create Project'}
-            </ButtonSave>
-            <ButtonCancel
-              onClick={handleCancel}
-              className="btn btn--secondary"
-            >
-              Cancel
-            </ButtonCancel>
-          </div>
-        </form>
-      )}
+                  <ButtonEdit
+                    onClick={() => handleEdit(project)}
+                  >
+                    Edit
+                  </ButtonEdit>
 
-      {loading ? (
-        <p>Loading projects...</p>
-      ) : myProjects.length === 0 ? (
-        <div className="empty-state">
-          <p>No projects yet. Create one to get started!</p>
-        </div>
-      ) : (
-        <Section>
-        <div className="items-list">
-          {myProjects.map((project) => (
-            <div key={project.id} className="task-item">
-              <div>
-                <h3>{project.name}</h3>
-                
-                <span className="hours-badge">{project.hours}h</span>
-                
-                <div className="task-description">
-                {project.description && (
-                  <p>{project.description}</p>
-                )}
-
-                
-                  <p>
-                    <strong>Manager:</strong> {' '}
-                    {project.manager === user?.id ? 'You' : `User #${project.manager}`}
-                  </p>
+                  <ButtonDelete
+                    onClick={() => handleDelete(project.id)}
+                  >
+                    Delete
+                  </ButtonDelete>
                 </div>
               </div>
-
-              <div className="item-actions">
-                <ButtonTask
-                  onClick={() => handleViewTasks(project.id)}
-                  title="View and manage tasks for this project"
-                >
-                  Tasks
-                </ButtonTask>
-
-                <ButtonEdit
-                  onClick={() => handleEdit(project)}
-                >
-                  Edit
-                </ButtonEdit>
-
-                <ButtonDelete
-                  onClick={() => handleDelete(project.id)}
-                >
-                  Delete
-                </ButtonDelete>
-              </div>
-            </div>
-          ))}
-        </div>
-        </Section>
-      )}
-    </section>
+            ))}
+          </div>
+          </Section>
+        )}
+      </section>
+    </main>
+    </>
   );
 };
 

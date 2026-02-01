@@ -10,8 +10,8 @@ import { faBusinessTime, faBars, faXmark, faClock,
   faFolder, 
   faLock, 
   faMobileAlt  } from '@fortawesome/free-solid-svg-icons';
-import { Icon } from '../components/icons/Icon'
 import '../styles/navbar.css'
+import '../styles/landing.css'
 
 export function LandingPage() {
   const navigate = useNavigate();
@@ -156,7 +156,7 @@ export function LandingPage() {
       </Section>
 
       {/* ===== CTA ===== */}
-      <Section style={{ background: 'linear-gradient(135deg, var(--color-primary), var(--color-primary-hover))', textAlign: 'center' }}>
+      <Section style={{ background: 'linear-gradient(135deg, var(--color-primary), var(--color-primary-hover))', textAlign: 'center', marginBottom: '30px'}}>
         <h2>Ready to Track Your Time?</h2>
         <p style={{ margin: 'var(--space-4) auto var(--space-6)', maxWidth: '600px'}}>
           Start logging your work in seconds. No credit card required. Free forever plan available.
@@ -169,6 +169,7 @@ export function LandingPage() {
         >
           Get Started Now
         </Button>
+        
       </Section>
 
       {/* ===== PRICING ===== */}
@@ -209,9 +210,10 @@ export function LandingPage() {
           ))}
         </div>
       </Section>
-        <hr/>
+        
       {/* ===== FOOTER ===== */}
-      <footer className='footer' style={{ padding: 'var(--space-4) var(--space-0)', textAlign: 'center' }}>
+      <footer className='footer' style={{ padding: 'var(--space-4) var(--space-0)', textAlign: 'center', marginTop: '50px' }}>
+        <hr/>
         <div style={{ maxWidth: '1400px', margin: '0 auto' }}>
           <p>&copy; 2026 Fancy Logger</p>
         </div>

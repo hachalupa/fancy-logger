@@ -10,23 +10,34 @@ import { Section } from '../components/ui/Section'
 import { Card } from '../components/ui/Card'
 import { Button } from '../components/ui/Button'
 import { ButtonEdit, ButtonDelete, ButtonAdd, ButtonCancel, ButtonSave } from '../components/buttons/ActionButtons';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faSpinner } from '@fortawesome/free-solid-svg-icons';
 
 const Dashboard = () => {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
   const timer = useTimer();
-  
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
+
+  useEffect(() => {
+    if (isModalOpen) {
+      document.body.classList.add('modal-open');
+    } else {
+      document.body.classList.remove('modal-open');
+    }
+
+    return () => {
+      document.body.classList.remove('modal-open');
+    };
+  }, [isModalOpen]);
+
+
   // TAB STATE
   const [activeTab, setActiveTab] = useState('log');  // 'log', 'projects', 'tasks'
   
   // PROJECTS
   const [projects, setProjects] = useState([]);
-  const [projectForm, setProjectForm] = useState({ 
-    name: '', 
-    description: '', 
-    hours: ''
-  });
-  const [editingProject, setEditingProject] = useState(null);
   
   // TASK TYPES
   const [tasks, setTasks] = useState([]);
@@ -46,7 +57,6 @@ const Dashboard = () => {
 
   // TYPES
   const [types, setTypes] = useState([]);
-  const [selectedType, setSelectedType] = useState('');
   const [typeForm, setTypeForm] = useState({ name: ''});
   const [editingType, setEditingType] = useState(null);
   
@@ -54,7 +64,6 @@ const Dashboard = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
-  const [showProjectForm, setShowProjectForm] = useState(false);
   const [showTaskForm, setShowTaskForm] = useState(false);
   const [showTypeForm, setShowTypeForm] = useState(false);
 
@@ -83,104 +92,13 @@ const Dashboard = () => {
       console.log('✅ Tasks loaded:', tasksRes.data);
       console.log('✅ Types loaded:', typesRes.data);
 
-    } catch (err) {
-      console.error('Error loading:', err);
+    } catch (error) {
+      console.error('Error loading:', error);
       setError('Failed to load data');
     } finally {
       setLoading(false);
     }
   };
-
-  // ===== PROJECTS HANDLERS =====
-  const handleViewTasks = (projectId) => {
-    console.log('📋 Opening tasks for project:', projectId);
-    navigate(`/projects/${projectId}/tasks`);
-  };
-
-
-
-
-  const handleSaveProject = async (e) => {
-    e.preventDefault();
-    setError('');
-    setSuccess('');
-
-    if (!projectForm.name || !projectForm.hours) {
-      setError('❌ Fill in all required fields (Name, Hours)');
-      return;
-    }
-
-    try {
-      const payload = {
-        name: projectForm.name,
-        description: projectForm.description,
-        hours: projectForm.hours
-      };
-
-      console.log('📤 Sending payload:', payload); 
-
-      if (editingProject) {
-        await api.patch(`/projects/${editingProject.id}`, payload);
-        setSuccess('✅ Project updated successfully!');
-      } else {
-        await api.post('/projects', {
-          name: projectForm.name,
-          description: projectForm.description,
-          hours: projectForm.hours
-        });
-        setSuccess('✅ Project created successfully!');
-      }
-
-      setProjectForm({ name: '', description: '', hours: '' });
-      setEditingProject(null);
-      setShowProjectForm(false);
-      
-      setTimeout(() => {
-        loadAllData();
-        setSuccess('');
-      }, 1500);
-    } catch (err) {
-      console.error('❌ Save error:', err);
-      setError('❌ ' + (err.response?.data?.message || 'Failed to save project'));
-    }
-  };
-
-
-  const handleEditProject = (project) => {
-    setEditingProject(project);
-    setProjectForm({
-      name: project.name,
-      description: project.description || '',
-      manager: project.manager,
-      hours: project.hours
-    });
-    setShowProjectForm(true);
-    setActiveTab('projects');
-  };
-
-  const handleDeleteProject = async (id) => {
-    if (!window.confirm('🗑️ Delete this project? This cannot be undone.')) return;
-
-    try {
-      await api.delete(`/projects/${id}`);
-      setSuccess('✅ Project deleted!');
-      setTimeout(() => {
-        loadAllData();
-        setSuccess('');
-      }, 1000);
-    } catch (err) {
-      console.log(err)
-      setError('❌ Failed to delete project');
-    }
-  };
-
-  const handleCancelProjectForm = () => {
-    setShowProjectForm(false);
-    setEditingProject(null);
-    setProjectForm({ name: '', description: '', hours: '' });
-    setError('');
-  };
-
   // ===== TASKS HANDLERS =====
   const handleSaveTask = async (e) => {
     e.preventDefault();
@@ -214,14 +132,14 @@ const Dashboard = () => {
       setTaskForm({ name: '', description: '', hours: '', status: false });
       setEditingTask(null);
       setShowTaskForm(false);
-      
+      setIsModalOpen(false);
       setTimeout(() => {
         loadAllData();
         setSuccess('');
       }, 1500);
-    } catch (err) {
-      console.error('Save task error:', err);
-      setError('❌ ' + (err.response?.data?.message || 'Failed to save task type'));
+    } catch (error) {
+      console.error('Save task error:', error);
+      setError('❌ ' + (error.response?.data?.message || 'Failed to save task type'));
     }
   };
 
@@ -235,6 +153,7 @@ const Dashboard = () => {
     });
     setShowTaskForm(true);
     setActiveTab('tasks');
+    setIsModalOpen(true);
   };
 
   const handleDeleteTask = async (id) => {
@@ -247,17 +166,20 @@ const Dashboard = () => {
         loadAllData();
         setSuccess('');
       }, 1000);
-    } catch (err) {
+    } catch (error) {
       setError('❌ Failed to delete task type');
+      console.log(error)
     }
   };
 
   const handleCancelTaskForm = () => {
     setShowTaskForm(false);
     setEditingTask(null);
+    setIsModalOpen(false);
     setTaskForm({ name: '', description: '', hours: '', status: false });
     setError('');
   };
+
 
   // ===== TYPES HANDLER =====
   const handleSaveType = async (e) => {
@@ -291,9 +213,9 @@ const Dashboard = () => {
         loadAllData();
         setSuccess('');
       }, 1500);
-    } catch (err) {
-      console.error('Save type error:', err);
-      setError('❌ ' + (err.response?.data?.message || 'Failed to save type'));
+    } catch (error) {
+      console.error('Save type error:', error);
+      setError('❌ ' + (error.response?.data?.message || 'Failed to save type'));
     }
   };
 
@@ -316,8 +238,9 @@ const Dashboard = () => {
         loadAllData();
         setSuccess('');
       }, 1000);
-    } catch (err) {
+    } catch (error) {
       setError('❌ Failed to delete type');
+      console.log(error)
     }
   };
 
@@ -362,9 +285,9 @@ const Dashboard = () => {
         loadAllData();
         setSuccess('');
       }, 1500);
-    } catch (err) {
-      console.error('Save entry error:', err);
-      setError('❌ ' + (err.response?.data?.message || 'Failed to save entry'));
+    } catch (error) {
+      console.error('Save entry error:', error);
+      setError('❌ ' + (error.response?.data?.message || 'Failed to save entry'));
     }
   };
 
@@ -377,10 +300,10 @@ const Dashboard = () => {
     return (
       <div className="dashboard">
         <header className="header">
-          <h1>⏱️ Fancy Logger</h1>
+          <h1>Fancy Logger</h1>
         </header>
         <div style={{ padding: '40px', textAlign: 'center', fontSize: '18px' }}>
-          ⏳ Loading...
+          <FontAwesomeIcon icon={faSpinner} /> Loading...
         </div>
       </div>
     );
@@ -463,7 +386,7 @@ const Dashboard = () => {
               </ButtonSave>
             </div>
 
-            <Section className="entries-section">
+            <section className="entries-section">
               <h3>Recent Work Entries ({entries.length})</h3>
               {entries.length === 0 ? (
                 <p className="no-entries">No entries yet. Start tracking your work!</p>
@@ -484,118 +407,9 @@ const Dashboard = () => {
                   ))}
                 </div>
               )}
-            </Section>
+            </section>
           </Section>
         )}
-
-        {/* ===== PROJECTS TAB ===== */}
-        {activeTab === 'projects' && (
-          <section className="manager-section">
-            <div className="section-header">
-              <h2>📋 Projects Management</h2>
-              {!showProjectForm && (
-                <button 
-                  onClick={() => setShowProjectForm(true)}
-                  className="btn-primary"
-                >
-                  ➕ Create New Project
-                </button>
-              )}
-            </div>
-
-            {showProjectForm && (
-              <form onSubmit={handleSaveProject} className="manager-form">
-                <h3>{editingProject ? '✏️ Edit Project' : 'Create New Project'}</h3>
-                
-                <div>
-                  <label>Project Name *</label>
-                  <input
-                    type="text"
-                    placeholder="e.g., Website Redesign"
-                    value={projectForm.name}
-                    onChange={(e) => setProjectForm({...projectForm, name: e.target.value})}
-                    required
-                  />
-                </div>
-
-                <div>
-                  <label>Description</label>
-                  <textarea
-                    placeholder="What is this project about?"
-                    value={projectForm.description}
-                    onChange={(e) => setProjectForm({...projectForm, description: e.target.value})}
-                    rows="3"
-                  />
-                </div>
-
-                <div>
-                  <label>Hours Allocated *</label>
-                  <input
-                    type="number"
-                    placeholder="e.g., 40"
-                    value={projectForm.hours}
-                    onChange={(e) => setProjectForm({...projectForm, hours: parseInt(e.target.value)})}
-                    min="1"
-                    required
-                  />
-                </div>
-
-                <div className="form-buttons">
-                  <button type="submit" className="btn-primary">
-                    {editingProject ? '💾 Update Project' : '✅ Create Project'}
-                  </button>
-                  <button type="button" onClick={handleCancelProjectForm} className="btn-secondary">
-                    ✕ Cancel
-                  </button>
-                </div>
-              </form>
-            )}
-
-            {projects.length === 0 && !showProjectForm && (
-              <div className="empty-state">
-                <p>📭 No projects yet</p>
-                <p>Click "Create New Project" button to get started!</p>
-              </div>
-            )}
-
-            <div className="items-grid">
-              {projects .filter(project => project.manager === user.id)
-              .map((project) => (
-                <div key={project.id} className="project-card">
-                  <div className="card-header">
-                    <h3>{project.name}</h3>
-                    <span className="hours-badge">{project.hours}h</span>
-                  </div>
-                  {project.description && <p className="card-description">{project.description}</p>}
-                  <div className="card-meta">
-                    <p><strong>👤 Manager:</strong> {project.manager === user.id ? 'You' : `User ${project.manager}`}</p>
-                  </div>
-                  <div className="card-actions">
-                    <button 
-                      onClick={() => handleViewTasks(project.id)}
-                      className="btn btn--primary btn--sm"
-                    >
-                      📋 Tasks
-                    </button>
-                    <button 
-                      onClick={() => handleEditProject(project)}
-                      className="btn-edit"
-                    >
-                      ✏️ Edit
-                    </button>
-                    <button 
-                      onClick={() => handleDeleteProject(project.id)}
-                      className="btn-delete"
-                    >
-                      🗑️ Delete
-                    </button>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </section>
-        )}
-
         {/* ===== TASKS TAB ===== */}
         {activeTab === 'tasks' && (
           <section className="manager-section">
@@ -604,61 +418,63 @@ const Dashboard = () => {
             </div>
 
             {showTaskForm && (
-              <div className='modal'>
-                <form onSubmit={handleSaveTask} className="manager-form">
-                <h3>{editingTask ? 'Edit Task' : 'Create New Task'}</h3>
-                
-                <div className='description-form'>
-                  <label>Task Name *</label>
-                  <input
-                    type="text"
-                    placeholder="e.g., Design Creation, Programming, Testing"
-                    value={taskForm.name}
-                    onChange={(e) => setTaskForm({...taskForm, name: e.target.value})}
-                    required
-                  />
-                </div>
+              <div className='modal-backdrop' onClick={handleCancelTaskForm}>
+                <div className='modal' onClick={(e) => e.stopPropagation()}>
+                    <form onSubmit={handleSaveTask} className="manager-form">
+                    <h3>{editingTask ? 'Edit Task' : 'Create New Task'}</h3>
+                    
+                    <div className='description-form'>
+                      <label>Task Name *</label>
+                      <input
+                        type="text"
+                        placeholder="e.g., Design Creation, Programming, Testing"
+                        value={taskForm.name}
+                        onChange={(e) => setTaskForm({...taskForm, name: e.target.value})}
+                        required
+                      />
+                    </div>
 
-                <div className='description-form'>
-                  <label>Description</label>
-                  <textarea
-                    placeholder="What does this task involve?"
-                    value={taskForm.description}
-                    onChange={(e) => setTaskForm({...taskForm, description: e.target.value})}
-                    rows="3"
-                  />
-                </div>
+                    <div className='description-form'>
+                      <label>Description</label>
+                      <textarea
+                        placeholder="What does this task involve?"
+                        value={taskForm.description}
+                        onChange={(e) => setTaskForm({...taskForm, description: e.target.value})}
+                        rows="3"
+                      />
+                    </div>
 
-                <div className='description-form'>
-                  <label>Hours Allocated *</label>
-                  <input
-                    type="number"
-                    placeholder="e.g., 40"
-                    value={taskForm.hours}
-                    onChange={(e) => setTaskForm({...taskForm, hours: parseInt(e.target.value)})}
-                    min="1"
-                    required
-                  />
-                </div>
+                    <div className='description-form'>
+                      <label>Hours Allocated *</label>
+                      <input
+                        type="number"
+                        placeholder="e.g., 40"
+                        value={taskForm.hours}
+                        onChange={(e) => setTaskForm({...taskForm, hours: parseInt(e.target.value)})}
+                        min="1"
+                        required
+                      />
+                    </div>
 
-                <div className='description-form'>
-                  <label>Status</label>
-                  <input
-                    type='checkbox'
-                    checked={taskForm.status || false}
-                    onChange={(e) => setTaskForm({...taskForm, status: e.target.checked})}
-                  />
-                </div>
+                    <div className='description-form'>
+                      <label>Mark as completed</label>
+                      <input
+                        type='checkbox'
+                        checked={taskForm.status || false}
+                        onChange={(e) => setTaskForm({...taskForm, status: e.target.checked})}
+                      />
+                    </div>
 
-                <div className="form-buttons">
-                  <ButtonSave type="submit" className="btn-primary">
-                    {editingTask ? 'Update Task' : 'Create Task'}
-                  </ButtonSave>
-                  <ButtonCancel onClick={handleCancelTaskForm} className="btn-secondary">
-                    Cancel
-                  </ButtonCancel>
+                    <div className="form-buttons">
+                      <ButtonSave type="submit" className="btn btn-primary">
+                        {editingTask ? 'Update Task' : 'Create Task'}
+                      </ButtonSave>
+                      <ButtonCancel onClick={handleCancelTaskForm} className="btn btn-secondary">
+                        Cancel
+                      </ButtonCancel>
+                    </div>
+                  </form>
                 </div>
-              </form>
               </div>
             )}
 
@@ -698,65 +514,69 @@ const Dashboard = () => {
             <div className="section-header">
               <h2>Types Management</h2>
               {!showTypeForm && (
-                <button 
+                <ButtonAdd 
                   onClick={() => setShowTypeForm(true)}
                   className="btn-primary"
                 >
                   Create New Type
-                </button>
+                </ButtonAdd>
               )}
             </div>
 
             {showTypeForm && (
-              <form onSubmit={handleSaveType} className="manager-form">
-                <h3>{editingType ? 'Edit Type' : 'Create New Type'}</h3>
-                
-                <div>
-                  <label>Type Name *</label>
-                  <input
-                    type="text"
-                    placeholder="e.g., Design Creation, Programming, Testing"
-                    value={typeForm.name}
-                    onChange={(e) => setTypeForm({...typeForm, name: e.target.value})}
-                    required
-                  />
-                </div>
-
-                <div className="form-buttons">
-                  <ButtonSave type="submit" className="btn-primary">
-                    {editingType ? 'Update Type' : 'Create Type'}
-                  </ButtonSave>
-                  <ButtonCancel type="button" onClick={handleCancelTypeForm} className="btn-secondary">
-                    Cancel
-                  </ButtonCancel>
-                </div>
-              </form>
-            )}
-
-            {types.length === 0 && !showTypeForm && (
-              <div className="empty-state">
-                <p>No types yet</p>
-                <p>Click "Create New Type" button to get started!</p>
-              </div>
-            )}
-
-            <div className="items-list">
-              {types.map((type) => (
-                <div key={type.id} className="task-item">
+            <div className='modal-backdrop' onClick={handleCancelTypeForm}>
+              <div className='modal' onClick={(e) => e.stopPropagation()}>
+                <form onSubmit={handleSaveType} className="manager-form">
+                  <h3>{editingType ? 'Edit Type' : 'Create New Type'}</h3>
+                  
                   <div>
-                    <h4>{type.name}</h4>
+                    <label>Type Name *</label>
+                    <input
+                      type="text"
+                      placeholder="e.g., Design Creation, Programming, Testing"
+                      value={typeForm.name}
+                      onChange={(e) => setTypeForm({...typeForm, name: e.target.value})}
+                      required
+                    />
                   </div>
-                  <div className="item-actions">
-                    <ButtonEdit onClick={() => handleEditType(type)}>
-                      Edit
-                    </ButtonEdit>
-                    <ButtonDelete onClick={() => handleDeleteType(type.id)}>
-                      Delete
-                    </ButtonDelete>
+
+                  <div className="form-buttons">
+                    <ButtonSave type="submit" className="btn btn-primary">
+                      {editingType ? 'Update Type' : 'Create Type'}
+                    </ButtonSave>
+                    <ButtonCancel type="button" onClick={handleCancelTypeForm} className="btn btn-secondary">
+                      Cancel
+                    </ButtonCancel>
                   </div>
+                </form>
                 </div>
-              ))}
             </div>
+              )}
+
+              {types.length === 0 && !showTypeForm && (
+                <div className="empty-state">
+                  <p>No types yet</p>
+                  <p>Click "Create New Type" button to get started!</p>
+                </div>
+              )}
+
+              <div className="items-list">
+                {types.map((type) => (
+                  <div key={type.id} className="task-item">
+                    <div>
+                      <h4>{type.name}</h4>
+                    </div>
+                    <div className="item-actions">
+                      <ButtonEdit onClick={() => handleEditType(type)}>
+                        Edit
+                      </ButtonEdit>
+                      <ButtonDelete onClick={() => handleDeleteType(type.id)}>
+                        Delete
+                      </ButtonDelete>
+                    </div>
+                  </div>
+                ))}
+              </div>
           </section>
         )}
       </main>

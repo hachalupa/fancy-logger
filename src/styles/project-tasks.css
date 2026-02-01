@@ -777,8 +777,11 @@ css
 }
 
 .project-header-meta {
-  display: flex;
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: var(--space-16);
   margin-top: var(--space-16);
+  
 }
 
 .meta-item {
@@ -1262,6 +1265,7 @@ css
   .project-header-meta {
     display: grid;
     grid-template-rows: 1fr;
+    grid-template-columns: 1fr;
   }
 
   .progress-header {
@@ -1294,12 +1298,12 @@ css
 
 @media (max-width: 480px) {
   .project-tasks-container {
-    padding: var(--space-12);
+    padding: var(--space-8);
   }
 
   .project-header {
-    gap: var(--space-12);
-    margin-bottom: var(--space-24);
+    gap: var(--space-8);
+    margin-bottom: var(--space-8);
     padding-bottom: var(--space-16);
   }
 
@@ -1309,12 +1313,12 @@ css
 
   .project-header-subtitle {
     font-size: var(--font-size-base);
-    margin-bottom: var(--space-12);
+    margin-bottom: var(--space-8);
   }
 
   .project-header-meta {
-    gap: var(--space-12);
-    margin-top: var(--space-12);
+    gap: var(--space-8);
+    margin-top: var(--space-8);
   }
 
   .meta-item {
@@ -1439,6 +1443,24 @@ css
 
   .message-icon {
     font-size: var(--font-size-base);
+  }
+
+  .form-group input,
+  .form-group textarea,
+  .form-group select,
+  .manager-form textarea,
+  .manager-form input,
+  .manager-form select {
+    padding: var(--space-4) var(--space-6);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-base);
+    background: none;
+    color: var(--color-text);
+    font-family: var(--font-family-base);
+    font-size: var(--font-size-md);
+    line-height: var(--line-height-normal);
+    transition: border-color var(--duration-fast) var(--ease-standard),
+      box-shadow var(--duration-fast) var(--ease-standard);
   }
 }
 

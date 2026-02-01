@@ -4,11 +4,19 @@ import { useAuth } from '../context/AuthContext';
 import api from '../services/api';
 import '../styles/project-tasks.css';
 import { ButtonAdd, ButtonBack, ButtonCancel, ButtonDelete, ButtonEdit, ButtonSave } from '../components/buttons/ActionButtons';
+import { Navbar } from '../components/Navbar';
+import { faExclamation, faDiagramProject, faTriangleExclamation } from '@fortawesome/free-solid-svg-icons';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
 const ProjectTasks = () => {
   const { projectId } = useParams();
   const navigate = useNavigate();
-  const { user } = useAuth();
+  const { user, logout } = useAuth();
+
+  const handleLogout = () => {
+    logout();
+    navigate('/login', { replace: true });
+  };
 
   const [project, setProject] = useState(null);
   const [tasks, setTasks] = useState([]);
@@ -76,7 +84,7 @@ const ProjectTasks = () => {
     setSuccess('');
 
     if (!formData.name || !formData.description || !formData.hours || !formData.typeId) {
-      setError('❌ Fill in all required fields');
+      setError('Fill in all required fields');
       return;
     }
 
@@ -88,7 +96,7 @@ const ProjectTasks = () => {
     
     if (totalHours > project.hours) {
       setError(
-        `❌ Total task hours (${totalHours}h) exceeds project allocation (${project.hours}h). ` +
+        `Total task hours (${totalHours}h) exceeds project allocation (${project.hours}h). ` +
         `You can allocate max ${project.hours - projectTasksHours}h for this task.`
       );
       return;
@@ -148,6 +156,7 @@ const ProjectTasks = () => {
       }, 500);
     } catch (err) {
       setError('Failed to update task status');
+      console.log(err)
     }
   };
 
@@ -163,6 +172,7 @@ const ProjectTasks = () => {
       }, 1000);
     } catch (err) {
       setError('Failed to delete task');
+      console.log(err)
     }
   };
 
@@ -184,7 +194,7 @@ const ProjectTasks = () => {
   if (loading) {
     return (
       <div className="project-tasks-container" style={{ textAlign: 'center', paddingTop: '60px' }}>
-        <p style={{ fontSize: '18px' }}>⏳ Loading...</p>
+        <p style={{ fontSize: '18px' }}>Loading...</p>
       </div>
     );
   }
@@ -192,9 +202,9 @@ const ProjectTasks = () => {
   if (!project) {
     return (
       <div className="project-tasks-container" style={{ textAlign: 'center', paddingTop: '60px' }}>
-        <p>❌ Project not found</p>
+        <p> Project not found</p>
         <button onClick={() => navigate('/projects')} className="btn btn--primary">
-          ← Back to Projects
+          Back to Projects
         </button>
       </div>
     );
@@ -210,6 +220,13 @@ const ProjectTasks = () => {
   const isOverBudget = totalTasksHours > project.hours;
 
   return (
+    <>
+    <Navbar
+        variant="projects"
+        user={user}
+        onLogout={handleLogout}
+    />
+    <main className='container'>
     <div className="project-tasks-container">
       {/* ===== HEADER ===== */}
       <div className="project-header">
@@ -237,28 +254,18 @@ const ProjectTasks = () => {
             </div>
           </div>
         </div>
-
-        <div className="project-header-actions">
-          <ButtonBack
-            onClick={() => navigate('/projects')}
-            className="btn btn-secondary"
-          >
-            Back to Projects
-          </ButtonBack>
-        </div>
       </div>
 
       {/* ===== ALERTS ===== */}
       {error && (
         <div className="message-alert error">
-          <span className="message-icon">❌</span>
+          <span className="message-icon"><FontAwesomeIcon icon={faExclamation}/></span>
           <div className="message-content">{error}</div>
           <button className="message-close" onClick={() => setError('')}>✕</button>
         </div>
       )}
       {success && (
         <div className="message-alert success">
-          <span className="message-icon">✅</span>
           <div className="message-content">{success}</div>
           <button className="message-close" onClick={() => setSuccess('')}>✕</button>
         </div>
@@ -267,7 +274,7 @@ const ProjectTasks = () => {
       {/* ===== PROGRESS SECTION ===== */}
       <div className="progress-section">
         <div className="progress-header">
-          <h3>📊 Project Progress</h3>
+          <h3><FontAwesomeIcon icon={faDiagramProject} /> Project Progress</h3>
           <div className={`progress-status ${isProjectCompleted ? 'completed' : 'pending'}`}>
             {isProjectCompleted ? 'Project Completed!' : 'In Progress'}
           </div>
@@ -287,7 +294,7 @@ const ProjectTasks = () => {
           </div>
           {isOverBudget && (
             <div className="progress-warning">
-              ⚠️ Over budget by {totalTasksHours - project.hours}h
+              <FontAwesomeIcon icon={faTriangleExclamation} /> Over budget by {totalTasksHours - project.hours}h
             </div>
           )}
         </div>
@@ -408,7 +415,7 @@ const ProjectTasks = () => {
       <div className="tasks-section">
         {myTasks.length === 0 && !showForm && (
           <div className="empty-state">
-            <p>📭 No tasks yet</p>
+            <p>No tasks yet</p>
             <p style={{ fontSize: '0.9em', marginTop: 'var(--space-8)' }}>Create one to start tracking your work!</p>
           </div>
         )}
@@ -417,59 +424,61 @@ const ProjectTasks = () => {
           const hoursPercentage = (task.hours / project.hours) * 100;
           
           return (
-            <div 
-              key={task.id} 
-              className={`task-item ${task.status ? 'completed' : ''}`}
-            >
-              <div className="task-content">
-                <input
-                  type="checkbox"
-                  className="task-checkbox"
-                  checked={task.status || false}
-                  onChange={() => handleToggleStatus(task.id, task.status)}
-                  title="Mark as complete"
-                />
+              <div 
+                key={task.id} 
+                className={`task-item ${task.status ? 'completed' : ''}`}
+              >
+                <div className="task-content">
+                  <input
+                    type="checkbox"
+                    className="task-checkbox"
+                    checked={task.status || false}
+                    onChange={() => handleToggleStatus(task.id, task.status)}
+                    title="Mark as complete"
+                  />
 
-                <div className="task-details">
-                  <h4 className="task-title">
-                    {task.status ? '✓' : '○'} {task.name}
-                  </h4>
+                  <div className="task-details">
+                    <h4 className="task-title">
+                      {task.name}
+                    </h4>
 
-                  {task.description && (
-                    <p className="task-description">{task.description}</p>
-                  )}
+                    {task.description && (
+                      <p className="task-description">{task.description}</p>
+                    )}
 
-                  <div className="task-meta">
-                    <div className="meta-badge type">
-                      {getTypeName(task.type || task.typeId)}
-                    </div>
-                    <div className="meta-badge hours">
-                      {task.hours}h ({hoursPercentage.toFixed(1)}%)
-                    </div>
-                    <div className={`meta-badge status`}>
-                      {task.status ? 'Completed' : 'Pending'}
+                    <div className="task-meta">
+                      <div className="meta-badge type">
+                        {getTypeName(task.type || task.typeId)}
+                      </div>
+                      <div className="meta-badge hours">
+                        {task.hours}h ({hoursPercentage.toFixed(1)}%)
+                      </div>
+                      <div className={`meta-badge status`}>
+                        {task.status ? 'Completed' : 'Pending'}
+                      </div>
                     </div>
                   </div>
                 </div>
-              </div>
 
-              <div className="task-actions">
-                <ButtonEdit
-                  onClick={() => handleEdit(task)}
-                >
-                  Edit
-                </ButtonEdit>
-                <ButtonDelete
-                  onClick={() => handleDelete(task.id)}
-                >
-                  Delete
-                </ButtonDelete>
+                <div className="task-actions">
+                  <ButtonEdit
+                    onClick={() => handleEdit(task)}
+                  >
+                    Edit
+                  </ButtonEdit>
+                  <ButtonDelete
+                    onClick={() => handleDelete(task.id)}
+                  >
+                    Delete
+                  </ButtonDelete>
+                </div>
               </div>
-            </div>
           );
         })}
       </div>
     </div>
+    </main>
+    </>
   );
 };
 

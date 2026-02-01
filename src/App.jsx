@@ -6,12 +6,9 @@ import Dashboard from './pages/Dashboard';
 import ProtectedRoute from './components/ProtectedRoute';
 import ForgotPassword from './pages/ForgotPassword';
 import ResetPassword from './pages/ResetPassword';
-import TaskTypesManager from './pages/TaskTypesManager';
 import ProjectsManager from './pages/ProjectsManager';
 import ProjectTasks from './pages/ProjectTasks';
 import { LandingPage } from './pages/LandingPage';
-import { TestPage, TestIcons } from './pages/TestPage';
-import { Navbar } from './components/Navbar';
 
 function App() {
   return (
@@ -29,15 +26,6 @@ function App() {
               <ProtectedRoute>
                 
                 <Dashboard />
-              </ProtectedRoute>
-            }
-          />
-          
-          <Route
-            path="/task-types"
-            element={
-              <ProtectedRoute>
-                <TaskTypesManager />
               </ProtectedRoute>
             }
           />

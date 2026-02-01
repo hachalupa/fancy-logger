@@ -186,6 +186,58 @@ a:hover {
 
 /* ===== UTILITY CLASSES ===== */
 
+select {
+  background: var(--color-primary);
+  color: var(--color-text);
+  border: 1px solid var(--color-primary);
+  border-radius: 8px;
+  padding: 12px;
+  font-size: 16px;
+  cursor: pointer;
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='m6 8 4 4 4-4'/%3e%3c/svg%3e");
+  background-position: right 12px center;
+  background-repeat: no-repeat;
+  background-size: 16px;
+}
+
+select:hover,
+select:focus {
+  background-color: var(--color-primary-hover);
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+option {
+  padding: 12px 16px;
+  background: var(--color-text);
+  color: var(--color-text-secondary);
+}
+
+option:hover,
+option:focus {
+  box-shadow: 0 0 10px 100px var(--color-primary) inset !important;
+  color: var(--color-text-secondary)!important;
+  font-weight: 500;
+}
+
+option:checked {
+  box-shadow: 0 0 10px 100px var(--color-primary-active, #1e40af) inset !important;
+  color: var(--color-text-secondary)!important;
+  font-weight: bold;
+}
+
+/* Firefox */
+@-moz-document url-prefix() {
+  option:hover,
+  option:focus {
+    background: var(--color-primary) !important;
+    color: var(--color-text) !important;
+  }
+}
+
+
+
 /* Layout */
 .container {
   width: 100%;
@@ -452,5 +504,6 @@ a:hover {
   
   .container {
     padding: 0 var(--space-2);
+    top: 60px;
   }
 }

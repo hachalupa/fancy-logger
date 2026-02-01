@@ -18,7 +18,7 @@ const ResetPassword = () => {
     return (
       <div className="auth-page">
         <div className="auth-box">
-          <h2>❌ Invalid Reset Link</h2>
+          <h2>Invalid Reset Link</h2>
           <p>The password reset link is invalid or expired.</p>
           <Button onClick={() => navigate('/login')}>Go to Login</Button>
         </div>

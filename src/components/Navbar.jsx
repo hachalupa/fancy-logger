@@ -84,7 +84,8 @@ export function Navbar({
   }
 
   // ===== DASHBOARD NAVBAR =====
-  return (
+  if (variant === 'dashboard') {
+    return (
     <>
       <nav className="navbar">
         <a href="/dashboard" className="navbar-logo">
@@ -171,5 +172,61 @@ export function Navbar({
         </Button>
       </div>
     </>
-  );
+    );
+  }
+
+  if (variant === 'projects') {
+    return (
+      <>
+        <nav className="navbar">
+        <a href="/dashboard" className="navbar-logo">
+        <FontAwesomeIcon icon={faBusinessTime} /> Fancy Logger
+        </a>
+        
+
+        {/* Desktop Navigation */}
+        <div className="navbar-desktop">
+          <a href='/projects' className="tab-btn">
+        Projects
+          </a>
+           <a href='/dashboard' className='tab-btn'>
+            Go Back
+           </a>
+          <div className="navbar-right">
+            <span className="username">Hi, {user?.username}</span>
+            <Button className="btn-secondary" onClick={handleLogout}>
+            Logout
+            </Button>
+          </div>
+        </div>
+
+        {/* Mobile Menu Toggle */}
+        <button 
+          className="navbar-toggle"
+          onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+          aria-label={mobileMenuOpen ? 'Close menu' : 'Open menu'}
+        >
+          <FontAwesomeIcon icon={mobileMenuOpen ? faXmark : faBars} />
+        </button>
+      </nav>
+
+      {/* Mobile Navigation Menu */}
+      <div className={`navbar-mobile ${mobileMenuOpen ? 'open' : ''}`}>
+        <a href="/projects" className="tab-btn" onClick={() => setMobileMenuOpen(false)}>
+        Projects
+        </a>
+        <a href='/dashboard' className='tab-btn'>
+            Go Back
+           </a>
+        <Button
+          onClick={handleLogout}
+          className="btn-secondary"
+          style={{ width: '100%', marginTop: '1rem' }}
+        >
+        Logout
+        </Button>
+      </div>
+      </>
+    );
+  }
 }
